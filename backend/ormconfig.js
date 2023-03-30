@@ -1,0 +1,15 @@
+module.exports = {
+  type: 'mysql',
+  host: process.env.DB_HOST,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  synchronize: process.env.NODE_ENV !== 'prod',
+  entities: [__dirname + '/dist/entities/**/*.js'],
+  logging: process.env.NODE_ENV !== 'production' ? 'all' : 'error',
+  migrations: [__dirname + '/dist/migration/**/*.js'],
+  subscribers: [__dirname + '/dist/subscriber/**/*.js'],
+  cli: { migrationsDir: 'migration' },
+  connectTimeout: 30000,
+  acquireTimeout: 30000,
+};
