@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const LoginForm = () => {
+const LoginRegisterView = () => {
   const navigate = useNavigate();
 
   const handleLoginClick = () => {
@@ -16,9 +16,10 @@ const LoginForm = () => {
     <div>
       <h2>Welcome page</h2>
       <button onClick={handleLoginClick} type="button">Login</button>
+      <br />
       <button onClick={handleRegisterClick} type="button">Register</button>
     </div>
   );
 };
 
-export default LoginForm;
+export default LoginRegisterView;
