@@ -2,15 +2,31 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
+import { Link } from "react-router-dom";
 
 const NavBarView = () => {
+  const navLinks = [
+    { title: "Hobby", path: "/hobby" },
+    { title: "Hobby List", path: "/hobby/list" },
+  ];
+
   return (
     <Navbar fixed="top" bg="dark" variant="dark">
       <Container>
-        <Navbar.Brand href="/home">Hinder</Navbar.Brand>
+        <Navbar.Brand as={Link} to="/home">
+          Hinder
+        </Navbar.Brand>
         <Nav className="me-auto">
-          <Nav.Link href="/hobby">Hobby</Nav.Link>
-          <Nav.Link href="/">Sign out</Nav.Link>
+          {navLinks.map((link) => (
+            <Nav.Link as={Link} to={link.path} key={link.title}>
+              {link.title}
+            </Nav.Link>
+          ))}
+        </Nav>
+        <Nav>
+          <Nav.Link as={Link} className="text-danger" to="/">
+            Sign out
+          </Nav.Link>
         </Nav>
       </Container>
     </Navbar>

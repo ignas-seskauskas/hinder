@@ -2,11 +2,11 @@
 
 ## Running frontend
 
-1. Install npm
+1. Install npm/pnpm
 2. Install yarn
 3. `cd frontend`
-4. `yarn install`
-5. `yarn run dev`
+4. `yarn/pnpm install`
+5. `yarn/pnpm run dev`
 
 ## Running backend
 
