@@ -1,7 +1,6 @@
+.idea/
+.vscode/
 node_modules/
-.idea/*
-*.log
-migration/
-dist/
-coverage/*
-.env
+build/
+tmp/
+temp/

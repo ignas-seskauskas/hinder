@@ -12,7 +12,12 @@
 
 1. Install mysql
 2. Run mysql
-3. Create backend/.env file with mysql data, example:
+3. `cd backend`
+4. `yarn/pnpm install`
+5. pnpm start (didn't test with yarn/npm)
+
+## Old backend
+~~3. Create backend/.env file with mysql data, example:
 
 ```
 TOKEN_SECRET_KEY=very_secretave
@@ -24,8 +29,8 @@ PORT=5000
 ```
 
 4. `cd backend`
-5. `yarn install`
-6. `yarn watch-ts` in first terminal (this will compile ts files to js on save)
-7. `yarn serve` in second terminal (this will run your compiled js files)
+5. `yarn/pnpm install`
+6. `yarn/pnpm watch-ts` in first terminal (this will compile ts files to js on save)
+7. `yarn/pnpm serve` in second terminal (this will run your compiled js files)
 
-Edit entity files to change database structure. All entities sync after running `yarn serve`
+Edit entity files to change database structure. All entities sync after running `yarn serve`~~
