@@ -14,7 +14,7 @@ const RegisterForm = () => {
       "Form submitted with username:",
       username,
       "and password:",
-      password,
+      password
     );
     navigate("/login");
   };

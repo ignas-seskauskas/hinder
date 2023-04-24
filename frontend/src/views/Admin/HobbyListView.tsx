@@ -1,16 +1,37 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ListGroup from "react-bootstrap/ListGroup";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import Hobby from "../../interfaces/Hobby";
 
 const HobbyListView = () => {
   const pathPrefix = "/hobby/";
-  const hobbies = [
-    { name: "Some hobby", path: "1" },
-    { name: "Another hobby", path: "2" },
-  ];
-  hobbies.forEach((hobby) => {
-    hobby.path = pathPrefix + hobby.path;
-  });
+  const [data, setData] = useState<Hobby[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/hobbies");
+        if (!response.ok) {
+          console.log(response);
+          throw new Error("Failed to fetch data");
+        }
+        const jsonData: Hobby[] = await response.json();
+        setData(jsonData);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const navigate = useNavigate();
+
+  function handleClick(hobby: Hobby) {
+    const path = pathPrefix + hobby.id;
+    navigate(path, { state: hobby });
+  }
+
   return (
     <div>
       <h2>Hobby list view</h2>
@@ -18,8 +39,12 @@ const HobbyListView = () => {
         <ListGroup.Item className="fw-bold fs-5" variant="dark">
           Name
         </ListGroup.Item>
-        {hobbies.map((hobby) => (
-          <ListGroup.Item action as={Link} to={hobby.path} key={hobby.name}>
+        {data.map((hobby) => (
+          <ListGroup.Item
+            action
+            onClick={() => handleClick(hobby)}
+            key={hobby.name}
+          >
             {hobby.name}
           </ListGroup.Item>
         ))}

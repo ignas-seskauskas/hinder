@@ -15,9 +15,13 @@ const LoginRegisterView = () => {
   return (
     <div>
       <h2>Welcome page</h2>
-      <button onClick={handleLoginClick} type="button">Login</button>
+      <button onClick={handleLoginClick} type="button">
+        Login
+      </button>
       <br />
-      <button onClick={handleRegisterClick} type="button">Register</button>
+      <button onClick={handleRegisterClick} type="button">
+        Register
+      </button>
     </div>
   );
 };
