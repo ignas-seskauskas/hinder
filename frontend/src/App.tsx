@@ -1,13 +1,15 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
-import LoginPage from "./views/Login/LoginPage";
+import "bootstrap/dist/css/bootstrap.min.css";
+
+import { WithNav, WithoutNav } from "./components/";
+
 import LoginRegisterView from "./views/Login/LoginRegisterView";
+import LoginPage from "./views/Login/LoginPage";
 import RegisterPage from "./views/Login/RegisterPage";
 import HobbySearcherView from "./views/Home/HobbySearcherView";
-import WithNav from "./components/WithNav";
-import WithoutNav from "./components/WithoutNav";
 import HobbyPage from "./views/Hobby/HobbyPage";
-import "bootstrap/dist/css/bootstrap.min.css";
+import HobbyListView from "./views/Admin/HobbyListView";
 
 function App() {
   return (
@@ -21,7 +23,8 @@ function App() {
           </Route>
           <Route element={<WithNav />}>
             <Route path="/home" element={<HobbySearcherView />} />
-            <Route path="/hobby" element={<HobbyPage />} />
+            <Route path="/hobby/*" element={<HobbyPage />} />
+            <Route path="/hobby/list" element={<HobbyListView />} />
           </Route>
         </Routes>
       </BrowserRouter>

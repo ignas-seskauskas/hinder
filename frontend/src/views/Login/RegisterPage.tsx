@@ -16,7 +16,7 @@ const RegisterForm = () => {
       "and password:",
       password,
     );
-    navigate("/home");
+    navigate("/login");
   };
 
   return (
