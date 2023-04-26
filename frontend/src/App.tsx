@@ -10,6 +10,7 @@ import RegisterPage from "./views/Login/RegisterPage";
 import HobbySearcherView from "./views/Home/HobbySearcherView";
 import HobbyPage from "./views/Hobby/HobbyPage";
 import HobbyListView from "./views/Admin/HobbyListView";
+import AdminHomeView from "./views/Home/AdminHomeView";
 
 function App() {
   return (
@@ -22,7 +23,7 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
           </Route>
           <Route element={<WithNav />}>
-            <Route path="/home" element={<HobbySearcherView />} />
+            <Route path="/home" element={<AdminHomeView />} />
             <Route path="/hobby/*" element={<HobbyPage />} />
             <Route path="/hobby/list" element={<HobbyListView />} />
           </Route>

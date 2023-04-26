@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 const NavBarView = () => {
   const navLinks = [
-    { title: "Hobby", path: "/not_implemented" },
+    //{ title: "Hobby", path: "/not_implemented" },
     { title: "Hobby List", path: "/hobby/list" },
   ];
 
