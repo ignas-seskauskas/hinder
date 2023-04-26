@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
 @Entity()
 export class Hobby {
 
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({type: "bigint" })
     id: number
 
     @Column()
