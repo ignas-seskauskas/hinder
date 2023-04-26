@@ -25,9 +25,10 @@ export class HobbyController {
     }
 
     async save(request: Request, response: Response, next: NextFunction) {
-        const { name, type, place, attempts, attemptDuration } = request.body;
+        const { id, name, type, place, attempts, attemptDuration } = request.body;
 
         const hobby = Object.assign(new Hobby(), {
+            id,
             name,
             type,
             place,
