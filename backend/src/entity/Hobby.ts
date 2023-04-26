@@ -1,4 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm"
+import { Route } from "./Route"
+import { UserHobby } from "./UserHobby"
+
+export enum HobbyType {
+    PASSIVE = 'Passive',
+    ACTIVE = 'Active',
+}
+
+export enum HobbyPlace {
+    INDOORS = 'Indoors',
+    OUTDOORS = 'Outdoors',
+}
 
 @Entity()
 export class Hobby {
@@ -9,15 +21,21 @@ export class Hobby {
     @Column()
     name: string
 
-    @Column()
-    type: string
+    @Column({type: 'enum', enum: HobbyType})
+    type: HobbyType
 
-    @Column()
-    place: string
+    @Column({type: 'enum', enum: HobbyPlace})
+    place: HobbyPlace
 
     @Column()
     attempts: number
 
     @Column()
     attemptDuration: number
+
+    //@OneToMany(() => UserHobby, (userHobby) => userHobby.hobby, {nullable: true})
+    //userHobby: UserHobby[]
+
+    //@OneToMany(() => Route, (route) => route.hobby, { nullable: true })
+    //routes: Route[]
 }
