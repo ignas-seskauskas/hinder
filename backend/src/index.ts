@@ -3,7 +3,7 @@ import * as bodyParser from "body-parser";
 import { Request, Response } from "express";
 import { AppDataSource } from "./data-source";
 import { Routes } from "./routes";
-import { Hobby } from "./entity/Hobby";
+import { Hobby, HobbyType, HobbyPlace } from "./entity/Hobby";
 import * as cors from "cors";
 
 AppDataSource.initialize().then(async () => {
@@ -46,9 +46,9 @@ AppDataSource.initialize().then(async () => {
   if (res.length === 0) {
     await AppDataSource.manager.save(
       AppDataSource.manager.create(Hobby, {
-        name: "Hobby1",
-        type: "Type",
-        place: "Place",
+        name: "Cooking",
+        type: HobbyType.PASSIVE,
+        place: HobbyPlace.INDOORS,
         attempts: 1,
         attemptDuration: 10,
       }),
@@ -56,9 +56,9 @@ AppDataSource.initialize().then(async () => {
 
     await AppDataSource.manager.save(
       AppDataSource.manager.create(Hobby, {
-        name: "Hobby2",
-        type: "Type",
-        place: "Place",
+        name: "Cycling",
+        type: HobbyType.ACTIVE,
+        place: HobbyPlace.OUTDOORS,
         attempts: 2,
         attemptDuration: 25,
       }),

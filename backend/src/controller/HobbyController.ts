@@ -1,56 +1,75 @@
-import { AppDataSource } from '../data-source'
-import { NextFunction, Request, Response } from "express"
-import { Hobby } from "../entity/Hobby"
+import { AppDataSource } from "../data-source";
+import { NextFunction, Request, Response } from "express";
+import { Hobby } from "../entity/Hobby";
 
 export class HobbyController {
+  private hobbyRepository = AppDataSource.getRepository(Hobby);
 
-    private hobbyRepository = AppDataSource.getRepository(Hobby)
+  async all(request: Request, response: Response, next: NextFunction) {
+    return this.hobbyRepository.find();
+  }
 
-    async all(request: Request, response: Response, next: NextFunction) {
-        return this.hobbyRepository.find()
+  async one(request: Request, response: Response, next: NextFunction) {
+    const id = parseInt(request.params.id);
+
+    const hobby = await this.hobbyRepository.findOne({
+      where: { id },
+    });
+
+    if (!hobby) {
+      return "hobby not found";
+    }
+    return hobby;
+  }
+
+  async save(request: Request, response: Response, next: NextFunction) {
+    //const { id, name, type, place, attempts, attemptDuration } = request.body;
+    const hobbyData: Hobby = request.body;
+
+    const errCount = this.validateData(hobbyData, response);
+    if (errCount > 0) {
+      return;
     }
 
-    async one(request: Request, response: Response, next: NextFunction) {
-        const id = parseInt(request.params.id)
+    const hobby = Object.assign(new Hobby(), hobbyData);
 
+    return this.hobbyRepository.save(hobby);
+  }
 
-        const hobby = await this.hobbyRepository.findOne({
-            where: { id }
-        })
+  async remove(request: Request, response: Response, next: NextFunction) {
+    const id = parseInt(request.params.id);
 
-        if (!hobby) {
-            return "hobby not found"
-        }
-        return hobby
+    let hobbyToRemove = await this.hobbyRepository.findOneBy({ id });
+
+    if (!hobbyToRemove) {
+      return "this hobby does not exist";
     }
 
-    async save(request: Request, response: Response, next: NextFunction) {
-        const { id, name, type, place, attempts, attemptDuration } = request.body;
+    //this.deleteOfHobby(id);
 
-        const hobby = Object.assign(new Hobby(), {
-            id,
-            name,
-            type,
-            place,
-            attempts,
-            attemptDuration
-        })
+    await this.hobbyRepository.remove(hobbyToRemove);
 
-        return this.hobbyRepository.save(hobby)
+    return "hobby has been removed";
+  }
+
+  private validateData(hobby: Hobby, response: Response): number {
+    let errCount = 0;
+    const errCode = 418;
+
+    if (hobby.name === "") {
+      response.status(errCode).json({ error: "Empty name" });
+      errCount++;
+    } else if (hobby.type.toString() === "") {
+      response.status(errCode).json({ error: "Empty type" });
+      errCount++;
+    } else if (hobby.place.toString() === "") {
+      response.status(errCode).json({ error: "Empty place" });
+      errCount++;
     }
 
-    async remove(request: Request, response: Response, next: NextFunction) {
-        const id = parseInt(request.params.id)
+    return errCount;
+  }
 
-        let hobbyToRemove = await this.hobbyRepository.findOneBy({ id })
-
-        if (!hobbyToRemove) {
-            return "this hobby does not exist"
-        }
-
-        await this.hobbyRepository.remove(hobbyToRemove)
-
-        return "hobby has been removed"
-    }
-
+  private deleteOfHobby(id: number) {
+  }
 }

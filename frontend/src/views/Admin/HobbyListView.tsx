@@ -1,6 +1,6 @@
 import React, { SyntheticEvent, useEffect, useState } from "react";
-import { Button, Table, Modal, Form, InputGroup } from "react-bootstrap";
-import Hobby from "../../interfaces/Hobby";
+import { Button, Form, InputGroup, Modal, Table } from "react-bootstrap";
+import { Hobby } from "../../interfaces/Hobby";
 
 enum Place {
   Indoors = "Indoors",
@@ -16,6 +16,7 @@ const HobbyListView = () => {
   const URL = "http://localhost:3000/hobbies";
   const [hobbyList, setHobbyList] = useState<Hobby[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [toDelete, setToDelete] = useState<boolean>(false);
   const [selectedHobby, setSelectedHobby] = useState<Hobby | null>(null);
   const emptyHobby: Hobby = {
     id: 0,
@@ -26,6 +27,7 @@ const HobbyListView = () => {
     attemptDuration: 0,
   };
   const [newHobby, setNewHobby] = useState<Hobby>(emptyHobby);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,30 +51,42 @@ const HobbyListView = () => {
     setShowModal(false);
     setSelectedHobby(null);
     setNewHobby(emptyHobby);
+    setErrorMessage("");
+    setToDelete(false);
   };
 
-  const handleDelete = (hobbyID: number) => {
-    const finalURL = URL + "/" + hobbyID.toString();
-    fetch(finalURL, {
-      method: "delete",
-    }).then((response) => {
-      console.log(response);
-      if (response.ok) {
-        const updatedList = hobbyList.filter((hobby) => hobby.id !== hobbyID);
-        setHobbyList(updatedList);
-      }
-      return response;
-    });
+  const chooseHobbyDelete = (hobby: Hobby) => {
+    setSelectedHobby(hobby);
+    setShowModal(true);
+    setToDelete(true);
   };
 
-  const handleEdit = (hobby: Hobby) => {
+  const deleteHobby = () => {
+    if (selectedHobby) {
+      const finalURL = URL + "/" + selectedHobby.id.toString();
+      fetch(finalURL, {
+        method: "delete",
+      }).then((response) => {
+        console.log(response);
+        if (response.ok) {
+          const updatedList = hobbyList.filter(
+            (hobby) => hobby.id !== selectedHobby.id
+          );
+          setHobbyList(updatedList);
+          handleModalHide();
+        }
+        return response;
+      });
+    }
+  };
+
+  const chooseHobbyEdit = (hobby: Hobby) => {
     setSelectedHobby(hobby);
     setShowModal(true);
   };
 
-  const handleEditHobby = (e: SyntheticEvent) => {
+  const editHobby = (e: SyntheticEvent) => {
     e.preventDefault();
-    setShowModal(false);
 
     if (selectedHobby) {
       fetch(URL, {
@@ -81,28 +95,31 @@ const HobbyListView = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(selectedHobby),
-      }).then((response) => {
-        console.log(response);
-        if (response.ok) {
-          const updatedList = hobbyList.map((hobby) => {
-            if (hobby.id === selectedHobby.id) {
-              return selectedHobby;
-            } else {
-              return hobby;
-            }
-          });
-          setHobbyList(updatedList);
-        }
-        return response.json();
-      });
+      })
+        .then((response) => {
+          console.log(response);
+          if (response.ok) {
+            const updatedList = hobbyList.map((hobby) => {
+              if (hobby.id === selectedHobby.id) {
+                return selectedHobby;
+              } else {
+                return hobby;
+              }
+            });
+            setHobbyList(updatedList);
+            setShowModal(false);
+            setSelectedHobby(null);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setErrorMessage(data.error);
+        });
     }
-
-    setSelectedHobby(null);
   };
 
-  const handleAddHobby = (e: SyntheticEvent) => {
+  const createHobby = (e: SyntheticEvent) => {
     e.preventDefault();
-    setShowModal(false);
 
     const newHobbyID = { ...newHobby, id: Date.now() };
     setNewHobby(emptyHobby);
@@ -114,13 +131,18 @@ const HobbyListView = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(newHobbyID),
-    }).then((response) => {
-      console.log(response);
-      if (response.ok) {
-        setHobbyList([...hobbyList, newHobbyID]);
-      }
-      return response.json();
-    });
+    })
+      .then((response) => {
+        console.log(response);
+        if (response.ok) {
+          setHobbyList([...hobbyList, newHobbyID]);
+          setShowModal(false);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setErrorMessage(data.error);
+      });
   };
 
   return (
@@ -141,10 +163,16 @@ const HobbyListView = () => {
             <tr key={hobby.id}>
               <td>{hobby.name}</td>
               <td>
-                <Button variant="primary" onClick={() => handleEdit(hobby)}>
+                <Button
+                  variant="primary"
+                  onClick={() => chooseHobbyEdit(hobby)}
+                >
                   Edit
                 </Button>{" "}
-                <Button variant="danger" onClick={() => handleDelete(hobby.id)}>
+                <Button
+                  variant="danger"
+                  onClick={() => chooseHobbyDelete(hobby)}
+                >
                   Delete
                 </Button>
               </td>
@@ -154,14 +182,36 @@ const HobbyListView = () => {
       </Table>
 
       <Modal show={showModal} onHide={handleModalHide}>
-        {selectedHobby ? (
+        {toDelete && selectedHobby ? (
           <>
             <Modal.Header closeButton>
-              <Modal.Title>Edit Hobby</Modal.Title>
+              <Modal.Title>Delete Hobby</Modal.Title>
             </Modal.Header>
 
             <Modal.Body>
-              <Form onSubmit={handleEditHobby}>
+              Are you sure you want to delete "{selectedHobby.name}" hobby?
+            </Modal.Body>
+
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleModalHide}>
+                Cancel
+              </Button>
+              <Button variant="danger" onClick={deleteHobby}>
+                Delete
+              </Button>
+            </Modal.Footer>
+          </>
+        ) : selectedHobby ? (
+          <>
+            <Modal.Header closeButton>
+              <Modal.Title>Edit Hobby</Modal.Title>
+              <Modal.Title className="ms-5 text-danger">
+                {errorMessage}
+              </Modal.Title>
+            </Modal.Header>
+
+            <Modal.Body>
+              <Form onSubmit={editHobby}>
                 <Form.Label htmlFor="hobbyName">Name</Form.Label>
                 <InputGroup className="mb-3">
                   <Form.Control
@@ -238,10 +288,10 @@ const HobbyListView = () => {
             </Modal.Body>
 
             <Modal.Footer>
-              <Button variant="secondary" onClick={() => setShowModal(false)}>
+              <Button variant="secondary" onClick={handleModalHide}>
                 Cancel
               </Button>
-              <Button variant="primary" onClick={handleEditHobby}>
+              <Button variant="primary" onClick={editHobby}>
                 Save Changes
               </Button>
             </Modal.Footer>
@@ -250,10 +300,13 @@ const HobbyListView = () => {
           <>
             <Modal.Header closeButton>
               <Modal.Title>Add Hobby</Modal.Title>
+              <Modal.Title className="ms-5 text-danger">
+                {errorMessage}
+              </Modal.Title>
             </Modal.Header>
 
             <Modal.Body>
-              <Form onSubmit={handleAddHobby}>
+              <Form onSubmit={createHobby}>
                 <Form.Group controlId="name">
                   <Form.Label>Name</Form.Label>
                   <Form.Control
@@ -300,10 +353,10 @@ const HobbyListView = () => {
             </Modal.Body>
 
             <Modal.Footer>
-              <Button variant="secondary" onClick={() => setShowModal(false)}>
+              <Button variant="secondary" onClick={handleModalHide}>
                 Cancel
               </Button>
-              <Button variant="primary" onClick={handleAddHobby}>
+              <Button variant="primary" onClick={createHobby}>
                 Add New Hobby
               </Button>
             </Modal.Footer>
