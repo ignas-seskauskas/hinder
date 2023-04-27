@@ -70,7 +70,7 @@ const HobbyListView = () => {
         console.log(response);
         if (response.ok) {
           const updatedList = hobbyList.filter(
-            (hobby) => hobby.id !== selectedHobby.id
+            (hobby) => hobby.id !== selectedHobby.id,
           );
           setHobbyList(updatedList);
           handleModalHide();
@@ -122,7 +122,6 @@ const HobbyListView = () => {
     e.preventDefault();
 
     const newHobbyID = { ...newHobby, id: Date.now() };
-    setNewHobby(emptyHobby);
     console.log(newHobbyID);
 
     fetch(URL, {
@@ -137,6 +136,7 @@ const HobbyListView = () => {
         if (response.ok) {
           setHobbyList([...hobbyList, newHobbyID]);
           setShowModal(false);
+          setNewHobby(emptyHobby);
         }
         return response.json();
       })
@@ -182,186 +182,187 @@ const HobbyListView = () => {
       </Table>
 
       <Modal show={showModal} onHide={handleModalHide}>
-        {toDelete && selectedHobby ? (
-          <>
-            <Modal.Header closeButton>
-              <Modal.Title>Delete Hobby</Modal.Title>
-            </Modal.Header>
+        {toDelete && selectedHobby
+          ? (
+            <>
+              <Modal.Header closeButton>
+                <Modal.Title>Delete Hobby</Modal.Title>
+              </Modal.Header>
 
-            <Modal.Body>
-              Are you sure you want to delete "{selectedHobby.name}" hobby?
-            </Modal.Body>
+              <Modal.Body>
+                Are you sure you want to delete "{selectedHobby.name}" hobby?
+              </Modal.Body>
 
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleModalHide}>
-                Cancel
-              </Button>
-              <Button variant="danger" onClick={deleteHobby}>
-                Delete
-              </Button>
-            </Modal.Footer>
-          </>
-        ) : selectedHobby ? (
-          <>
-            <Modal.Header closeButton>
-              <Modal.Title>Edit Hobby</Modal.Title>
-              <Modal.Title className="ms-5 text-danger">
-                {errorMessage}
-              </Modal.Title>
-            </Modal.Header>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleModalHide}>
+                  Cancel
+                </Button>
+                <Button variant="danger" onClick={deleteHobby}>
+                  Delete
+                </Button>
+              </Modal.Footer>
+            </>
+          )
+          : selectedHobby
+          ? (
+            <>
+              <Modal.Header closeButton>
+                <Modal.Title>Edit Hobby</Modal.Title>
+                <Modal.Title className="ms-5 text-danger">
+                  {errorMessage}
+                </Modal.Title>
+              </Modal.Header>
 
-            <Modal.Body>
-              <Form onSubmit={editHobby}>
-                <Form.Label htmlFor="hobbyName">Name</Form.Label>
-                <InputGroup className="mb-3">
-                  <Form.Control
-                    id="hobbyName"
-                    aria-describedby="basic-addon3"
-                    value={selectedHobby.name}
-                    onChange={(e) =>
-                      setSelectedHobby({
-                        ...selectedHobby,
-                        name: e.target.value,
-                      })
-                    }
-                  />
-                </InputGroup>
-                <div className="mb-3">
-                  <label htmlFor="type" className="form-label">
-                    Type
-                  </label>
-                  <select
-                    className="form-control"
-                    value={selectedHobby.type}
-                    onChange={(e) =>
-                      setSelectedHobby({
-                        ...selectedHobby,
-                        type: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="">-- Select an option --</option>
-                    <option value={Type.Active}>{Type.Active}</option>
-                    <option value={Type.Passive}>{Type.Passive}</option>
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="place" className="form-label">
-                    Place
-                  </label>
-                  <select
-                    className="form-control"
-                    value={selectedHobby.place}
-                    onChange={(e) =>
-                      setSelectedHobby({
-                        ...selectedHobby,
-                        place: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="">-- Select an option --</option>
-                    <option value={Place.Outdoors}>{Place.Outdoors}</option>
-                    <option value={Place.Indoors}>{Place.Indoors}</option>
-                  </select>
-                </div>
-                <Form.Label htmlFor="attempts">Attempts</Form.Label>
-                <InputGroup className="mb-3">
-                  <Form.Control
-                    id="attempts"
-                    aria-describedby="basic-addon3"
-                    value={selectedHobby.attempts}
-                    readOnly
-                  />
-                </InputGroup>
-                <Form.Label htmlFor="attemptDuration">
-                  Attempt duration
-                </Form.Label>
-                <InputGroup className="mb-3">
-                  <Form.Control
-                    id="attemptDuration"
-                    aria-describedby="basic-addon3"
-                    value={selectedHobby.attemptDuration}
-                    readOnly
-                  />
-                </InputGroup>
-              </Form>
-            </Modal.Body>
+              <Modal.Body>
+                <Form onSubmit={editHobby}>
+                  <Form.Label htmlFor="hobbyName">Name</Form.Label>
+                  <InputGroup className="mb-3">
+                    <Form.Control
+                      id="hobbyName"
+                      aria-describedby="basic-addon3"
+                      value={selectedHobby.name}
+                      onChange={(e) =>
+                        setSelectedHobby({
+                          ...selectedHobby,
+                          name: e.target.value,
+                        })}
+                    />
+                  </InputGroup>
+                  <div className="mb-3">
+                    <label htmlFor="type" className="form-label">
+                      Type
+                    </label>
+                    <select
+                      className="form-control"
+                      value={selectedHobby.type}
+                      onChange={(e) =>
+                        setSelectedHobby({
+                          ...selectedHobby,
+                          type: e.target.value,
+                        })}
+                    >
+                      <option value="">-- Select an option --</option>
+                      <option value={Type.Active}>{Type.Active}</option>
+                      <option value={Type.Passive}>{Type.Passive}</option>
+                    </select>
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="place" className="form-label">
+                      Place
+                    </label>
+                    <select
+                      className="form-control"
+                      value={selectedHobby.place}
+                      onChange={(e) =>
+                        setSelectedHobby({
+                          ...selectedHobby,
+                          place: e.target.value,
+                        })}
+                    >
+                      <option value="">-- Select an option --</option>
+                      <option value={Place.Outdoors}>{Place.Outdoors}</option>
+                      <option value={Place.Indoors}>{Place.Indoors}</option>
+                    </select>
+                  </div>
+                  <Form.Label htmlFor="attempts">Attempts</Form.Label>
+                  <InputGroup className="mb-3">
+                    <Form.Control
+                      id="attempts"
+                      aria-describedby="basic-addon3"
+                      value={selectedHobby.attempts}
+                      readOnly
+                    />
+                  </InputGroup>
+                  <Form.Label htmlFor="attemptDuration">
+                    Attempt duration
+                  </Form.Label>
+                  <InputGroup className="mb-3">
+                    <Form.Control
+                      id="attemptDuration"
+                      aria-describedby="basic-addon3"
+                      value={selectedHobby.attemptDuration}
+                      readOnly
+                    />
+                  </InputGroup>
+                </Form>
+              </Modal.Body>
 
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleModalHide}>
-                Cancel
-              </Button>
-              <Button variant="primary" onClick={editHobby}>
-                Save Changes
-              </Button>
-            </Modal.Footer>
-          </>
-        ) : (
-          <>
-            <Modal.Header closeButton>
-              <Modal.Title>Add Hobby</Modal.Title>
-              <Modal.Title className="ms-5 text-danger">
-                {errorMessage}
-              </Modal.Title>
-            </Modal.Header>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleModalHide}>
+                  Cancel
+                </Button>
+                <Button variant="primary" onClick={editHobby}>
+                  Save Changes
+                </Button>
+              </Modal.Footer>
+            </>
+          )
+          : (
+            <>
+              <Modal.Header closeButton>
+                <Modal.Title>Add Hobby</Modal.Title>
+                <Modal.Title className="ms-5 text-danger">
+                  {errorMessage}
+                </Modal.Title>
+              </Modal.Header>
 
-            <Modal.Body>
-              <Form onSubmit={createHobby}>
-                <Form.Group controlId="name">
-                  <Form.Label>Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={newHobby.name}
-                    onChange={(e) => {
-                      setNewHobby({ ...newHobby, name: e.target.value });
-                    }}
-                  />
-                </Form.Group>
-                <div>
-                  <label htmlFor="type" className="form-label">
-                    Type
-                  </label>
-                  <select
-                    className="form-control"
-                    value={newHobby.type}
-                    onChange={(e) => {
-                      setNewHobby({ ...newHobby, type: e.target.value });
-                    }}
-                  >
-                    <option value="">-- Select an option --</option>
-                    <option value={Type.Active}>{Type.Active}</option>
-                    <option value={Type.Passive}>{Type.Passive}</option>
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="place" className="form-label">
-                    Place
-                  </label>
-                  <select
-                    className="form-control"
-                    value={newHobby.place}
-                    onChange={(e) => {
-                      setNewHobby({ ...newHobby, place: e.target.value });
-                    }}
-                  >
-                    <option value="">-- Select an option --</option>
-                    <option value={Place.Outdoors}>{Place.Outdoors}</option>
-                    <option value={Place.Indoors}>{Place.Indoors}</option>
-                  </select>
-                </div>
-              </Form>
-            </Modal.Body>
+              <Modal.Body>
+                <Form onSubmit={createHobby}>
+                  <Form.Group controlId="name">
+                    <Form.Label>Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={newHobby.name}
+                      onChange={(e) => {
+                        setNewHobby({ ...newHobby, name: e.target.value });
+                      }}
+                    />
+                  </Form.Group>
+                  <div>
+                    <label htmlFor="type" className="form-label">
+                      Type
+                    </label>
+                    <select
+                      className="form-control"
+                      value={newHobby.type}
+                      onChange={(e) => {
+                        setNewHobby({ ...newHobby, type: e.target.value });
+                      }}
+                    >
+                      <option value="">-- Select an option --</option>
+                      <option value={Type.Active}>{Type.Active}</option>
+                      <option value={Type.Passive}>{Type.Passive}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="place" className="form-label">
+                      Place
+                    </label>
+                    <select
+                      className="form-control"
+                      value={newHobby.place}
+                      onChange={(e) => {
+                        setNewHobby({ ...newHobby, place: e.target.value });
+                      }}
+                    >
+                      <option value="">-- Select an option --</option>
+                      <option value={Place.Outdoors}>{Place.Outdoors}</option>
+                      <option value={Place.Indoors}>{Place.Indoors}</option>
+                    </select>
+                  </div>
+                </Form>
+              </Modal.Body>
 
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleModalHide}>
-                Cancel
-              </Button>
-              <Button variant="primary" onClick={createHobby}>
-                Add New Hobby
-              </Button>
-            </Modal.Footer>
-          </>
-        )}
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleModalHide}>
+                  Cancel
+                </Button>
+                <Button variant="primary" onClick={createHobby}>
+                  Add New Hobby
+                </Button>
+              </Modal.Footer>
+            </>
+          )}
       </Modal>
     </div>
   );

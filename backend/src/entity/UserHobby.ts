@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Hobby } from "./Hobby";
 
-enum UserHobbyStatus {
+export enum UserHobbyStatus {
   REJECTED = "Rejected",
   ACTIVE = "Active",
   ATTEMPTED = "Attempted",
@@ -19,6 +19,6 @@ export class UserHobby {
   @Column()
   rating: number;
 
-  //@ManyToOne(() => Hobby, (hobby) => hobby.id)
-  //hobby: Hobby;
+  @ManyToOne(() => Hobby, (hobby) => hobby.userHobbies)
+  hobby: Hobby;
 }

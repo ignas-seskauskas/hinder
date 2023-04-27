@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm"
 import { Hobby } from "./Hobby"
 
-enum TravellingMethod {
+export enum TravellingMethod {
     WALKING = 'Walking',
     CYCLING = 'Cycling',
     DRIVING = 'Driving',
@@ -25,6 +25,6 @@ export class Route {
     @Column()
     rating: number
 
-    //@ManyToOne(() => Hobby, (hobby) => hobby.routes)
-    //hobby: Hobby
+    @ManyToOne(() => Hobby, (hobby) => hobby.routes)
+    hobby: Hobby
 }
