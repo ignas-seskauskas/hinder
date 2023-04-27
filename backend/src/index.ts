@@ -3,8 +3,10 @@ import * as bodyParser from "body-parser";
 import { Request, Response } from "express";
 import { AppDataSource } from "./data-source";
 import { Routes } from "./routes";
-import { Hobby, HobbyType, HobbyPlace } from "./entity/Hobby";
+import { Hobby, HobbyPlace, HobbyType } from "./entity/Hobby";
 import * as cors from "cors";
+import { UserHobby, UserHobbyStatus } from "./entity/UserHobby";
+import { Route, TravellingMethod } from "./entity/Route";
 
 AppDataSource.initialize().then(async () => {
   // create express app
@@ -44,6 +46,27 @@ AppDataSource.initialize().then(async () => {
   // insert new hobbies for test
   const res = await AppDataSource.manager.find(Hobby);
   if (res.length === 0) {
+    const userHobby1 = new UserHobby();
+    userHobby1.status = UserHobbyStatus.ATTEMPTED;
+    userHobby1.rating = 7;
+    await AppDataSource.manager.save(
+      userHobby1,
+    );
+    const userHobby2 = new UserHobby();
+    userHobby2.status = UserHobbyStatus.REJECTED;
+    userHobby2.rating = 0;
+    await AppDataSource.manager.save(
+      userHobby2,
+    );
+    const route1 = new Route();
+    route1.name = "Cycling in the park";
+    route1.rating = 6;
+    route1.distance = 1;
+    route1.travellingMethod = TravellingMethod.CYCLING;
+    await AppDataSource.manager.save(
+      route1,
+    );
+
     await AppDataSource.manager.save(
       AppDataSource.manager.create(Hobby, {
         name: "Cooking",
@@ -51,6 +74,8 @@ AppDataSource.initialize().then(async () => {
         place: HobbyPlace.INDOORS,
         attempts: 1,
         attemptDuration: 10,
+        userHobbies: [userHobby1],
+        routes: [],
       }),
     );
 
@@ -61,6 +86,8 @@ AppDataSource.initialize().then(async () => {
         place: HobbyPlace.OUTDOORS,
         attempts: 2,
         attemptDuration: 25,
+        userHobbies: [userHobby2],
+        routes: [route1],
       }),
     );
   }

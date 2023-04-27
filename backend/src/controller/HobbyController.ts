@@ -1,9 +1,13 @@
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Hobby } from "../entity/Hobby";
+import { Route } from "../entity/Route";
+import { UserHobby } from "../entity/UserHobby";
 
 export class HobbyController {
   private hobbyRepository = AppDataSource.getRepository(Hobby);
+  private routeRepository = AppDataSource.getRepository(Route);
+  private userHobbyRepository = AppDataSource.getRepository(UserHobby);
 
   async all(request: Request, response: Response, next: NextFunction) {
     return this.hobbyRepository.find();
@@ -45,7 +49,7 @@ export class HobbyController {
       return "this hobby does not exist";
     }
 
-    //this.deleteOfHobby(id);
+    await this.deleteOfHobby(id);
 
     await this.hobbyRepository.remove(hobbyToRemove);
 
@@ -70,6 +74,14 @@ export class HobbyController {
     return errCount;
   }
 
-  private deleteOfHobby(id: number) {
+  private async deleteOfHobby(id: number) {
+    await this.userHobbyRepository.createQueryBuilder()
+      .delete()
+      .where("hobbyId = :hobbyId", { hobbyId: id })
+      .execute();
+    await this.routeRepository.createQueryBuilder()
+      .delete()
+      .where("hobbyId = :hobbyId", { hobbyId: id })
+      .execute();
   }
 }

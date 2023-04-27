@@ -33,9 +33,9 @@ export class Hobby {
     @Column()
     attemptDuration: number
 
-    //@OneToMany(() => UserHobby, (userHobby) => userHobby.hobby, {nullable: true})
-    //userHobby: UserHobby[]
+    @OneToMany(() => UserHobby, (userHobby) => userHobby.hobby, {nullable: true})
+    userHobbies: UserHobby[]
 
-    //@OneToMany(() => Route, (route) => route.hobby, { nullable: true })
-    //routes: Route[]
+    @OneToMany(() => Route, (route) => route.hobby, { nullable: true })
+    routes: Route[]
 }
