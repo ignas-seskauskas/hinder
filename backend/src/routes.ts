@@ -1,23 +1,41 @@
-import { HobbyController } from "./controller/HobbyController"
+import { HobbyController } from "./controller/HobbyController";
+import { HobbyRecommendationCoefficientController } from "./controller/HobbyRecommendationCoefficientController";
 
-export const Routes = [{
+export const Routes = [
+  {
     method: "get",
     route: "/hobbies",
     controller: HobbyController,
-    action: "all"
-}, {
+    action: "all",
+  },
+  {
     method: "get",
     route: "/hobbies/:id",
     controller: HobbyController,
-    action: "one"
-}, {
+    action: "one",
+  },
+  {
     method: "post",
     route: "/hobbies",
     controller: HobbyController,
-    action: "save"
-}, {
+    action: "save",
+  },
+  {
     method: "delete",
     route: "/hobbies/:id",
     controller: HobbyController,
-    action: "remove"
-}]
+    action: "remove",
+  },
+  {
+    method: "put",
+    route: "/hobbyrecommendationcoefficients",
+    controller: HobbyRecommendationCoefficientController,
+    action: "edit",
+  },
+  {
+    method: "get",
+    route: "/hobbyrecommendationcoefficients",
+    controller: HobbyRecommendationCoefficientController,
+    action: "get",
+  },
+];
