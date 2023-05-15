@@ -5,6 +5,9 @@ import { UserHobby } from "./entity/UserHobby";
 import { Route } from "./entity/Route";
 import { HobbyRecommendationCoefficient } from "./entity/HobbyRecommendationCoefficient";
 import * as dotenv from "dotenv";
+import { HobbyCategory } from "./entity/HobbyCategory";
+import { User } from "./entity/User";
+import { UserFriend } from "./entity/UserFriend";
 
 dotenv.config();
 
@@ -17,7 +20,15 @@ export const AppDataSource = new DataSource({
   database: "hinder",
   synchronize: true,
   logging: false,
-  entities: [Hobby, UserHobby, Route, HobbyRecommendationCoefficient],
+  entities: [
+    Hobby,
+    UserHobby,
+    Route,
+    HobbyRecommendationCoefficient,
+    HobbyCategory,
+    User,
+    UserFriend,
+  ],
   migrations: [],
   subscribers: [],
 });

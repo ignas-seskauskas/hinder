@@ -1,6 +1,10 @@
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
-import { HobbyRecommendationCoefficient } from "../entity/HobbyRecommendationCoefficient";
+import {
+  HobbyRecommendationCoefficient,
+  HobbyRecommendationCoefficientField,
+  HobbyRecommendationCoefficientOperation,
+} from "../entity/HobbyRecommendationCoefficient";
 
 export class HobbyRecommendationCoefficientController {
   private hobbyRecommendationCoefficientRepository =
@@ -30,22 +34,31 @@ export class HobbyRecommendationCoefficientController {
     const errCode = 401;
 
     return hobbyCoefficients.some((hobbyCoefficient) => {
-      if (!hobbyCoefficient.field) {
-        response
-          .status(errCode)
-          .json({ error: "Empty field in one of the coefficients" });
+      if (
+        !Object.values(HobbyRecommendationCoefficientField).includes(
+          hobbyCoefficient.field
+        )
+      ) {
+        response.status(errCode).json({ error: "Invalid field value" });
         return true;
       }
-      if (!hobbyCoefficient.operation) {
-        response
-          .status(errCode)
-          .json({ error: "Empty operation in one of the coefficients" });
+      if (
+        !Object.values(HobbyRecommendationCoefficientOperation).includes(
+          hobbyCoefficient.operation
+        )
+      ) {
+        response.status(errCode).json({ error: "Invalid operation value" });
         return true;
       }
       if (Number(hobbyCoefficient.number) !== hobbyCoefficient.number) {
-        response
-          .status(errCode)
-          .json({ error: "Incorrect number value in one of the coefficients" });
+        response.status(errCode).json({ error: "Invalid number value" });
+        return true;
+      }
+      if (
+        Number(hobbyCoefficient.priority) !== hobbyCoefficient.priority ||
+        hobbyCoefficient.priority % 1 !== 0
+      ) {
+        response.status(errCode).json({ error: "Invalid priority value" });
         return true;
       }
 
