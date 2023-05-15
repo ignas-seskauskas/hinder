@@ -11,7 +11,7 @@ export class HobbyCategory {
   @Column()
   name: string;
 
-  @OneToMany(() => Hobby, (hobby) => hobby.hobbyCategory, {
+  @OneToMany(() => Hobby, (hobby) => hobby.category, {
     nullable: true,
   })
   hobbies: Hobby[];

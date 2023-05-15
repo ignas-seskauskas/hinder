@@ -10,9 +10,12 @@
   },
   "dependencies": {
     "bootstrap": "^5.2.3",
+    "crypto-js": "^4.1.1",
+    "js-sha256": "^0.9.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.4",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.43.9",
     "react-router-dom": "^6.10.0"
   },
   "devDependencies": {

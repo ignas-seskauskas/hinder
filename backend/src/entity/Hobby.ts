@@ -51,5 +51,5 @@ export class Hobby {
     () => HobbyCategory,
     (hobbyCategory: HobbyCategory) => hobbyCategory.hobbies
   )
-  hobbyCategory: HobbyCategory;
+  category: HobbyCategory;
 }

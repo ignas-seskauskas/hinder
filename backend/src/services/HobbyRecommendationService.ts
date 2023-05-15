@@ -10,8 +10,6 @@ type HobbyRecommendationCriteriaInstance = Array<{
 }>;
 
 export class HobbyRecommendationService {
-  private hobbyRepository = AppDataSource.getRepository(Hobby);
-  private userHobbyRepository = AppDataSource.getRepository(UserHobby);
   private hobbyRecommendationCoefficientService =
     new HobbyRecommendationCoefficientService();
 
@@ -83,10 +81,8 @@ export class HobbyRecommendationService {
       return cur.value > acc.value ? cur : acc;
     }).id;
 
-    return await this.hobbyRepository.findOne({
-      where: {
-        id: highestValueHobbyId,
-      },
+    return await AppDataSource.getRepository(Hobby).findOneBy({
+      id: highestValueHobbyId,
     });
   }
 
@@ -112,7 +108,8 @@ export class HobbyRecommendationService {
     let batchNumber = 0;
 
     while (true) {
-      const mostSimilarUsers = await this.userHobbyRepository
+      console.log("loop3");
+      const mostSimilarUsers = await AppDataSource.getRepository(UserHobby)
         .createQueryBuilder("uh1")
         .select("uh2.userId", "userId")
         .addSelect("COUNT(uh2.hobbyId)", "sharedHobbiesCount")
@@ -124,8 +121,8 @@ export class HobbyRecommendationService {
         .where("uh1.userId = :userId", { userId })
         .groupBy("uh2.userId")
         .orderBy("sharedHobbiesCount", "DESC")
-        .skip(batchNumber * batchSize)
-        .take(batchSize)
+        .offset(batchNumber * batchSize)
+        .limit(batchSize)
         .getRawMany();
 
       if (mostSimilarUsers.length === 0) {
@@ -139,14 +136,14 @@ export class HobbyRecommendationService {
           break;
         }
 
-        const newHobbies = await this.userHobbyRepository
+        const newHobbies = await AppDataSource.getRepository(UserHobby)
           .createQueryBuilder("uh")
           .select("uh.hobbyId", "hobbyId")
           .addSelect("SUM(uh.rating)", "value")
           .where("uh.userId = :similarUserId", { similarUserId })
           .andWhere(
             `uh.hobbyId NOT IN (
-                    SELECT hobbyId FROM UserHobby WHERE userId = :userId
+                    SELECT hobbyId FROM user_hobby WHERE userId = :userId
                 )`,
             { userId }
           )
@@ -175,7 +172,7 @@ export class HobbyRecommendationService {
     let batchNumber = 0;
 
     while (true) {
-      const bestHobbyCategories = await this.userHobbyRepository
+      const bestHobbyCategories = await AppDataSource.getRepository(UserHobby)
         .createQueryBuilder("uh")
         .select("h.category", "category")
         .addSelect("AVG(uh.rating)", "averageRating")
@@ -183,8 +180,8 @@ export class HobbyRecommendationService {
         .where("uh.userId = :userId", { userId })
         .groupBy("h.category")
         .orderBy("averageRating", "DESC")
-        .skip(batchNumber * batchSize)
-        .take(batchSize)
+        .offset(batchNumber * batchSize)
+        .limit(batchSize)
         .getRawMany();
 
       if (bestHobbyCategories.length === 0) {
@@ -198,21 +195,21 @@ export class HobbyRecommendationService {
           break;
         }
 
-        const newHobbies = await this.hobbyRepository
+        const newHobbies = await AppDataSource.getRepository(Hobby)
           .createQueryBuilder("h")
           .select("h.id", "hobbyId")
           .addSelect(
-            `(SELECT AVG(uh.rating) FROM UserHobby uh WHERE uh.hobbyId = h.id)`,
+            `(SELECT AVG(uh.rating) FROM user_hobby uh WHERE uh.hobbyId = h.id)`,
             "value"
           )
           .where("h.category = :category", { category })
           .andWhere(
             `h.id NOT IN (
-                    SELECT hobbyId FROM UserHobby WHERE userId = :userId
+                    SELECT hobbyId FROM user_hobby WHERE userId = :userId
                 )`,
             { userId }
           )
-          .orderBy("averageRating", "DESC")
+          .orderBy("value", "DESC")
           .getRawMany();
 
         hobbies = [...hobbies, ...newHobbies];
@@ -231,18 +228,18 @@ export class HobbyRecommendationService {
     userId: number,
     howManyToGet: number
   ) {
-    const mostPopularHobbies = await this.userHobbyRepository
+    const mostPopularHobbies = await AppDataSource.getRepository(UserHobby)
       .createQueryBuilder("uh")
       .select("uh.hobbyId", "hobbyId")
       .addSelect("COUNT(uh.userId)", "value")
       .where(
         `uh.hobbyId NOT IN (
-                SELECT hobbyId FROM UserHobby WHERE userId = :userId
+                SELECT hobbyId FROM user_hobby WHERE userId = :userId
             )`,
         { userId }
       )
       .groupBy("uh.hobbyId")
-      .orderBy("popularity", "DESC")
+      .orderBy("value", "DESC")
       .limit(howManyToGet)
       .getRawMany();
 
@@ -253,24 +250,24 @@ export class HobbyRecommendationService {
     userId: number,
     howManyToGet: number
   ) {
-    const mostPopularHobbies = await this.userHobbyRepository
+    const mostPopularHobbies = await AppDataSource.getRepository(UserHobby)
       .createQueryBuilder("uh")
       .select("uh.hobbyId", "hobbyId")
       .addSelect("COUNT(uh.userId)", "value")
       .where(
         `uh.userId IN (
-            SELECT uf.friendId FROM UserFriend uf WHERE uf.userId = :userId
+            SELECT uf.friendId FROM user_friend uf WHERE uf.searcherId = :userId OR uf.friendId = :userId
         )`,
         { userId }
       )
       .andWhere(
         `uh.hobbyId NOT IN (
-            SELECT hobbyId FROM UserHobby WHERE userId = :userId
+            SELECT hobbyId FROM user_hobby WHERE userId = :userId
         )`,
         { userId }
       )
       .groupBy("uh.hobbyId")
-      .orderBy("popularity", "DESC")
+      .orderBy("value", "DESC")
       .limit(howManyToGet)
       .getRawMany();
 

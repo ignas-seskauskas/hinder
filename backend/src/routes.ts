@@ -1,5 +1,6 @@
 import { HobbyController } from "./controller/HobbyController";
 import { HobbyRecommendationCoefficientController } from "./controller/HobbyRecommendationCoefficientController";
+import { UserController } from "./controller/UserController";
 
 export const Routes = [
   {
@@ -43,5 +44,17 @@ export const Routes = [
     route: "/starthobbyrecommendation",
     controller: HobbyController,
     action: "startHobbyRecommendation",
+  },
+  {
+    method: "post",
+    route: "/login",
+    controller: UserController,
+    action: "loginUser",
+  },
+  {
+    method: "post",
+    route: "/register",
+    controller: UserController,
+    action: "registerUser",
   },
 ];

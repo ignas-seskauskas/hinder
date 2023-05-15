@@ -2,9 +2,17 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { SessionStorageKey } from "../../constants/sessionStorage";
 
 const NavBarView = () => {
+  const navigate = useNavigate();
+
+  const logout = () => {
+    sessionStorage.removeItem(SessionStorageKey.Login);
+    navigate("/");
+  };
+
   const navLinks = [
     //{ title: "Hobby", path: "/not_implemented" },
     { title: "Hobby List", path: "/hobby/list" },
@@ -24,7 +32,7 @@ const NavBarView = () => {
           ))}
         </Nav>
         <Nav>
-          <Nav.Link as={Link} className="text-danger" to="/">
+          <Nav.Link className="text-danger" onClick={logout}>
             Sign out
           </Nav.Link>
         </Nav>
