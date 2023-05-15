@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Hobby } from "./Hobby";
+import { User } from "./User";
 
 export enum UserHobbyStatus {
   REJECTED = "Rejected",
@@ -21,4 +22,7 @@ export class UserHobby {
 
   @ManyToOne(() => Hobby, (hobby) => hobby.userHobbies)
   hobby: Hobby;
+
+  @ManyToOne(() => User, (user: User) => user.userHobbies)
+  user: User;
 }

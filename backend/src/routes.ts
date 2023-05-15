@@ -38,4 +38,10 @@ export const Routes = [
     controller: HobbyRecommendationCoefficientController,
     action: "get",
   },
+  {
+    method: "post",
+    route: "/starthobbyrecommendation",
+    controller: HobbyController,
+    action: "startHobbyRecommendation",
+  },
 ];
