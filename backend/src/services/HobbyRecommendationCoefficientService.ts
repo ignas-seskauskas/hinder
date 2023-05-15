@@ -10,19 +10,27 @@ export class HobbyRecommendationCoefficientService {
     AppDataSource.getRepository(HobbyRecommendationCoefficient);
   private cache = {};
 
+  constructor() {
+    this.getCoefficientedValue = this.getCoefficientedValue.bind(this);
+  }
+
   async getCoefficientedValue(
     field: HobbyRecommendationCoefficientField,
     value: number = 1
   ) {
-    const coefficients = this.cache[field]
+    const coefficients = this.cache?.[field]
       ? this.cache[field]
-      : await this.hobbyRecommendationCoefficientRepository.find({
+      : await AppDataSource.getRepository(HobbyRecommendationCoefficient).find({
           where: { field },
           order: {
             priority: "DESC",
           },
         });
     this.cache[field] = coefficients;
+
+    if (!coefficients || !coefficients.length) {
+      return value;
+    }
 
     return coefficients.reduce((accumulator, coefficient) => {
       switch (coefficient.operation) {

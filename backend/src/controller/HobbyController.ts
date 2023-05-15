@@ -66,9 +66,10 @@ export class HobbyController {
     response: Response,
     next: NextFunction
   ) {
-    const userId = parseInt(request.body.userId);
+    const userId = request.user?.id;
 
-    const user = await this.userRepository.findOneBy({ id: userId });
+    const user =
+      userId && (await this.userRepository.findOneBy({ id: userId }));
     if (!user) {
       response.status(404).json({ error: "User not found" });
       return;
@@ -77,7 +78,7 @@ export class HobbyController {
     const recommendedHobby =
       await this.hobbyRecommendationService.getRecommendedHobbyForUser(userId);
     if (!recommendedHobby) {
-      response.status(404).json({ error: "User not found" });
+      response.status(404).json({ error: "Hobby recommendation not found" });
       return;
     }
 
