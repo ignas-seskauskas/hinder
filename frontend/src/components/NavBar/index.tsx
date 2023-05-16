@@ -8,6 +8,7 @@ const NavBarView = () => {
   const navLinks = [
     //{ title: "Hobby", path: "/not_implemented" },
     { title: "Hobby List", path: "/hobby/list" },
+    { title: "Route List", path: "/route/list" },
   ];
 
   return (

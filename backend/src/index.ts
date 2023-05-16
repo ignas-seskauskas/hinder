@@ -43,6 +43,15 @@ AppDataSource.initialize().then(async () => {
   // start express server
   app.listen(3000);
 
+  // insert test data
+  await seedDB();
+
+  console.log(
+    "Express server has started on port 3000. Open http://localhost:3000/hobbies to see results",
+  );
+}).catch((error) => console.log(error));
+
+async function seedDB() {
   // insert new hobbies for test
   const res = await AppDataSource.manager.find(Hobby);
   if (res.length === 0) {
@@ -62,7 +71,7 @@ AppDataSource.initialize().then(async () => {
     route1.name = "Cycling in the park";
     route1.rating = 6;
     route1.distance = 1;
-    route1.travellingMethod = TravellingMethod.CYCLING;
+    route1.travellingMethod = TravellingMethod.Bicycle;
     await AppDataSource.manager.save(
       route1,
     );
@@ -92,7 +101,50 @@ AppDataSource.initialize().then(async () => {
     );
   }
 
-  console.log(
-    "Express server has started on port 3000. Open http://localhost:3000/hobbies to see results",
-  );
-}).catch((error) => console.log(error));
+  // insert new routes for test
+  const res1 = await AppDataSource.manager.find(Route);
+  if (res1.length === 0) {
+    //const route1 = new Route();
+    //route1.name = "Kaunas City";
+    //route1.hobby = res[0];
+    //route1.rating = 5;
+    //route1.distance = 15;
+    //route1.travellingMethod = TravellingMethod.Bicycle;
+    //await AppDataSource.manager.save(
+    //  route1,
+    //);
+    //const route2 = new Route();
+    //route2.name = "Vilnius City";
+    //route2.hobby = res[1];
+    //route2.rating = 5;
+    //route2.distance = 10;
+    //route2.travellingMethod = TravellingMethod.Walk;
+    //await AppDataSource.manager.save(
+    //  route2,
+    //);
+
+    //await AppDataSource.manager.save(
+    //  AppDataSource.manager.create(Hobby, {
+    //    name: "Cooking",
+    //    type: HobbyType.PASSIVE,
+    //    place: HobbyPlace.INDOORS,
+    //    attempts: 1,
+    //    attemptDuration: 10,
+    //    userHobbies: [userHobby1],
+    //    routes: [],
+    //  }),
+    //);
+
+    //await AppDataSource.manager.save(
+    //  AppDataSource.manager.create(Hobby, {
+    //    name: "Cycling",
+    //    type: HobbyType.ACTIVE,
+    //    place: HobbyPlace.OUTDOORS,
+    //    attempts: 2,
+    //    attemptDuration: 25,
+    //    userHobbies: [userHobby2],
+    //    routes: [route1],
+    //  }),
+    //);
+  }
+}
