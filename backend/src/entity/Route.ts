@@ -1,30 +1,39 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm"
-import { Hobby } from "./Hobby"
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import { Hobby } from "./Hobby";
+import { Node } from "./Node";
 
 export enum TravellingMethod {
-    WALKING = 'Walking',
-    CYCLING = 'Cycling',
-    DRIVING = 'Driving',
+  Walk = "walk",
+  Bicycle = "bicycle",
+  Drive = "drive",
 }
 
 @Entity()
 export class Route {
+  @PrimaryGeneratedColumn({ type: "bigint" })
+  id: number;
 
-    @PrimaryGeneratedColumn({type: "bigint" })
-    id: number
+  @Column()
+  name: string;
 
-    @Column()
-    name: string
+  @Column({ type: "float" })
+  distance: number;
 
-    @Column({type: "float"})
-    distance: number
+  @Column({ type: "enum", enum: TravellingMethod })
+  travellingMethod: TravellingMethod;
 
-    @Column({type: 'enum', enum: TravellingMethod})
-    travellingMethod: TravellingMethod
+  @Column()
+  rating: number;
 
-    @Column()
-    rating: number
+  @ManyToOne(() => Hobby, (hobby) => hobby.routes)
+  hobby: Hobby;
 
-    @ManyToOne(() => Hobby, (hobby) => hobby.routes)
-    hobby: Hobby
+  @OneToMany(() => Node, (node) => node.route, { nullable: true })
+  nodes: Node[];
 }
