@@ -14,26 +14,28 @@ import HobbyListView from "./views/Admin/HobbyListView";
 import AdminHomeView from "./views/Home/AdminHomeView";
 import RouteListView from "./views/Hobby/RouteListView";
 import RoutePage from "./views/Hobby/RoutePage";
+import AuthProvider from "./components/AuthProvider";
 
 function App() {
   return (
     <div className="App">
       <BrowserRouter>
-        <Routes>
-          <Route element={<WithoutNav />}>
-            <Route path="/" element={<LoginRegisterView />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-          </Route>
-          <Route element={<WithNav />}>
-            <Route path="/home" element={<HobbySearcherView />} />
-            <Route path="/admin" element={<AdminHomeView />} />
-            <Route path="/hobby/*" element={<HobbyPage />} />
-            <Route path="/hobby/list" element={<HobbyListView />} />
-            <Route path="/route/*" element={<RoutePage />} />
-            <Route path="/route/list" element={<RouteListView />} />
-          </Route>
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route element={<WithoutNav />}>
+              <Route path="/" element={<LoginRegisterView />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+            </Route>
+            <Route element={<WithNav />}>
+              <Route path="/home" element={<AdminHomeView />} />
+              <Route path="/hobby/*" element={<HobbyPage />} />
+              <Route path="/hobby/list" element={<HobbyListView />} />
+              <Route path="/route/*" element={<RoutePage />} />
+              <Route path="/route/list" element={<RouteListView />} />
+            </Route>
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </div>
   );
