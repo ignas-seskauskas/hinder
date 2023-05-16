@@ -3,11 +3,16 @@ import { NextFunction, Request, Response } from "express";
 import { Hobby } from "../entity/Hobby";
 import { Route } from "../entity/Route";
 import { UserHobby } from "../entity/UserHobby";
+import { HobbyRecommendationCoefficient } from "../entity/HobbyRecommendationCoefficient";
+import { User } from "../entity/User";
+import { HobbyRecommendationService } from "../services/HobbyRecommendationService";
 
 export class HobbyController {
   private hobbyRepository = AppDataSource.getRepository(Hobby);
   private routeRepository = AppDataSource.getRepository(Route);
   private userHobbyRepository = AppDataSource.getRepository(UserHobby);
+  private userRepository = AppDataSource.getRepository(User);
+  private hobbyRecommendationService = new HobbyRecommendationService();
 
   async all(request: Request, response: Response, next: NextFunction) {
     return this.hobbyRepository.find();
@@ -56,6 +61,30 @@ export class HobbyController {
     return "hobby has been removed";
   }
 
+  async startHobbyRecommendation(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
+    const userId = request.user?.id;
+
+    const user =
+      userId && (await this.userRepository.findOneBy({ id: userId }));
+    if (!user) {
+      response.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    const recommendedHobby =
+      await this.hobbyRecommendationService.getRecommendedHobbyForUser(userId);
+    if (!recommendedHobby) {
+      response.status(404).json({ error: "Hobby recommendation not found" });
+      return;
+    }
+
+    return recommendedHobby;
+  }
+
   private validateData(hobby: Hobby, response: Response): number {
     let errCount = 0;
     const errCode = 418;
@@ -75,11 +104,13 @@ export class HobbyController {
   }
 
   private async deleteOfHobby(id: number) {
-    await this.userHobbyRepository.createQueryBuilder()
+    await this.userHobbyRepository
+      .createQueryBuilder()
       .delete()
       .where("hobbyId = :hobbyId", { hobbyId: id })
       .execute();
-    await this.routeRepository.createQueryBuilder()
+    await this.routeRepository
+      .createQueryBuilder()
       .delete()
       .where("hobbyId = :hobbyId", { hobbyId: id })
       .execute();
