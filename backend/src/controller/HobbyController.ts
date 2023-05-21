@@ -2,7 +2,7 @@ import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Hobby } from "../entity/Hobby";
 import { Route } from "../entity/Route";
-import { UserHobby } from "../entity/UserHobby";
+import { UserHobby, UserHobbyStatus } from "../entity/UserHobby";
 import { HobbyRecommendationCoefficient } from "../entity/HobbyRecommendationCoefficient";
 import { User } from "../entity/User";
 import { HobbyRecommendationService } from "../services/HobbyRecommendationService";
@@ -83,6 +83,86 @@ export class HobbyController {
     }
 
     return recommendedHobby;
+  }
+
+  async hobbyAccepted(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
+    const id = parseInt(request.params.id);
+    const user = request.user;
+    const hobby = await this.hobbyRepository.findOne({
+      where: { id },
+    });
+
+    if (!hobby) {
+      response.status(404).json({ error: "Hobby not found" });
+      return;
+    }
+
+    if (!user) {
+      response.status(500).json({ error: "User not found" });
+      return;
+    }
+
+    const userHobby = await this.userHobbyRepository.findOne({
+      where: {
+        hobby: { id: id },
+        user: { id: user.id },
+      },
+    });
+
+    if (userHobby) {
+      response.status(401).json({ error: "Hobby already rated" });
+      return;
+    }
+
+    await AppDataSource.manager.save(
+      AppDataSource.manager.create(UserHobby, {
+        status: UserHobbyStatus.ACTIVE,
+        user: user,
+        hobby: hobby,
+      })
+    );
+  }
+
+  async dismissHobby(request: Request, response: Response, next: NextFunction) {
+    const id = parseInt(request.params.id);
+    const user = request.user;
+    const hobby = await this.hobbyRepository.findOne({
+      where: { id },
+    });
+
+    if (!hobby) {
+      response.status(404).json({ error: "Hobby not found" });
+      return;
+    }
+
+    if (!user) {
+      response.status(500).json({ error: "User not found" });
+      return;
+    }
+
+    const userHobby = await this.userHobbyRepository.findOne({
+      where: {
+        hobby: { id: id },
+        user: { id: user.id },
+      },
+    });
+
+    if (userHobby) {
+      response.status(401).json({ error: "Hobby already rated" });
+      return;
+    }
+
+    await AppDataSource.manager.save(
+      AppDataSource.manager.create(UserHobby, {
+        status: UserHobbyStatus.REJECTED,
+        user: user,
+        hobby: hobby,
+      })
+    );
   }
 
   private validateData(hobby: Hobby, response: Response): number {
