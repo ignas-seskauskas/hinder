@@ -66,6 +66,18 @@ export const Routes = [
   },
   {
     method: "post",
+    route: "/hobbyaccepted",
+    controller: HobbyController,
+    action: "hobbyAccepted",
+  },
+  {
+    method: "post",
+    route: "/dismisshobby",
+    controller: HobbyController,
+    action: "dismissHobby",
+  },
+  {
+    method: "post",
     route: "/login",
     controller: UserController,
     action: "loginUser",
