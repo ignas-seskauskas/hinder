@@ -1,13 +1,10 @@
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import {
   Button,
-  Form,
-  InputGroup,
   ListGroup,
-  Modal,
   Table,
 } from "react-bootstrap";
-import { useHistory, useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Route } from "../../interfaces/Route";
 
 const RouteListView = () => {

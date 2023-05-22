@@ -2,8 +2,11 @@ import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Route } from "../entity/Route";
 import { Node } from "../entity/Node";
+import axios from "axios";
+import * as dotenv from "dotenv";
 
 export class RouteController {
+  private API_KEY = process.env.MAP_API_KEY;
   private routeRepository = AppDataSource.getRepository(Route);
   private nodeRepository = AppDataSource.getRepository(Node);
 
@@ -21,8 +24,38 @@ export class RouteController {
     if (!route) {
       return "route not found";
     }
+
+    const nodes: Node[] = await this.nodeRepository.find({
+      where: {
+        route: route
+      }
+    })
+    route.nodes = nodes;
+
     return route;
   }
+
+  async update(request: Request, response: Response, next: NextFunction) {
+    const updatedRoute: Route = request.body;
+
+    const errCount = this.validateData(updatedRoute, response);
+    if (errCount > 0) {
+      return;
+    }
+
+    const route = await this.routeRepository.findOne({
+      where: { id: updatedRoute.id },
+    });
+
+    if (!route) {
+      return "route not found";
+    }
+
+    route.rating = parseInt(request.body.rating);
+
+    return this.routeRepository.save(route);
+  }
+
 
   async save(request: Request, response: Response, next: NextFunction) {
     const routeData: Route = request.body;
@@ -96,4 +129,58 @@ export class RouteController {
   //    .where("routeId = :routeId", { routeId: id })
   //    .execute();
   //}
+
+  async getInterestingPlaces(request: Request, response: Response, next: NextFunction) {
+    const places_max = 5;
+    const { lng, lat } = request.params;
+
+    try {
+      const fetchRes = await axios.get(
+        `https://api.geoapify.com/v2/places?categories=tourism,natural,national_park&bias=proximity:${lng},${lat}&limit=${places_max}&apiKey=${this.API_KEY}`,
+      );
+      const data = await fetchRes.data;
+      // setPlacesData(data.features);
+      response.send(data);
+    } catch (error) {
+      const errMessage = "Error fetching interesting places data:";
+      console.error(errMessage, error);
+      response.status(500).send(errMessage);
+    }
+  }
+
+  async getRoutes(request: Request, response: Response, next: NextFunction) {
+    const API_URL = `https://api.geoapify.com/v1/mapmatching?apiKey=${this.API_KEY}`;
+    console.log("req", request.body);
+    const body = JSON.stringify(request.body);
+    console.log(body);
+
+    try {
+      const fetchRes = await axios(
+        {
+          method: 'post',
+          url: API_URL,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          data: body,
+        });
+      //const fetchRes = await axios.post(
+      //  API_URL, body
+      //    //  {
+      //    //    method: "POST",
+      //    //    headers: { "Content-Type": "application/json" },
+      //    //    body: body,
+      //    //  },
+      //);
+      const data = await fetchRes.data;
+      console.log(data);
+      // setPlacesData(data.features);
+      response.send(data);
+    } catch (error) {
+      const errMessage = "Error fetching routes:";
+      console.error(errMessage, error);
+      response.status(500).send(errMessage);
+    }
+  }
+
 }

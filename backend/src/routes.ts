@@ -41,10 +41,28 @@ export const Routes = [
     action: "one",
   },
   {
+    method: "put",
+    route: "/routes",
+    controller: RouteController,
+    action: "update",
+  },
+  {
     method: "post",
     route: "/routes",
     controller: RouteController,
     action: "save",
+  },
+  {
+    method: "get",
+    route: "/routes/interesting-places/:lng/:lat",
+    controller: RouteController,
+    action: "getInterestingPlaces",
+  },
+  {
+    method: "post",
+    route: "/routes/mapmatching",
+    controller: RouteController,
+    action: "getRoutes",
   },
   {
     method: "put",

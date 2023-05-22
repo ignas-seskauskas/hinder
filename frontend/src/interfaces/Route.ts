@@ -1,4 +1,4 @@
-export interface Nore {
+export interface Node {
     coordX: number;
     coordY: number;
 }
