@@ -2,8 +2,21 @@ import { HobbyController } from "./controller/HobbyController";
 import { RouteController } from "./controller/RouteController";
 import { HobbyRecommendationCoefficientController } from "./controller/HobbyRecommendationCoefficientController";
 import { UserController } from "./controller/UserController";
+import { FriendsController } from "./controller/FriendsController";
 
 export const Routes = [
+  {
+    method: "get",
+    route: "/friends",
+    controller: FriendsController,
+    action: "all",
+  },
+  {
+    method: "delete",
+    route: "/friends/:id",
+    controller: FriendsController,
+    action: "remove",
+  },
   {
     method: "get",
     route: "/hobbies",

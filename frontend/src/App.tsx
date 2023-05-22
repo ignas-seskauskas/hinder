@@ -14,6 +14,7 @@ import HobbyListView from "./views/Admin/HobbyListView";
 import AdminHomeView from "./views/Home/AdminHomeView";
 import RouteListView from "./views/Hobby/RouteListView";
 import RoutePage from "./views/Hobby/RoutePage";
+import Friendsview from "./views/Friends/FriendsView";
 import AuthProvider from "./components/AuthProvider";
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
               <Route path="/hobby/list" element={<HobbyListView />} />
               <Route path="/route/*" element={<RoutePage />} />
               <Route path="/route/list" element={<RouteListView />} />
+              <Route path="/friends/*" element={<Friendsview />} />
             </Route>
           </Routes>
         </AuthProvider>
