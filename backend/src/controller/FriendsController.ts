@@ -51,11 +51,11 @@ export class FriendsController {
             return true;
         }
         catch (error){
-            console.error('Error fetching friends:', error);
+            console.error('Error removing friend:', error);
             res.status(500).json({ error: 'Failed to delete friend' });
             next(error);
         }
-      }
+    }
 
     private async deleteOfFriend(id: number) {
         await this.userFriendRepository
