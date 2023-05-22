@@ -6,8 +6,6 @@ import {
 } from "../entity/HobbyRecommendationCoefficient";
 
 export class HobbyRecommendationCoefficientService {
-  private hobbyRecommendationCoefficientRepository =
-    AppDataSource.getRepository(HobbyRecommendationCoefficient);
   private cache = {};
 
   constructor() {

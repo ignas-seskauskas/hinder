@@ -19,7 +19,7 @@ export class HobbyRecommendationService {
     const defaultCriteriaHobbyCount = 10;
 
     const criteria = [
-      this.applyCoefficientTransformationToCriteriaInstance(
+      await this.applyCoefficientTransformationToCriteriaInstance(
         await this.getMostRatedUntriedHobbiesFromSimiliarUsers(
           userId,
           await getCoefficientedValue(
@@ -29,7 +29,7 @@ export class HobbyRecommendationService {
         ),
         HobbyRecommendationCoefficientField.RATING_SUM_FROM_SIMILIAR_USER_OF_HOBBIES
       ),
-      this.applyCoefficientTransformationToCriteriaInstance(
+      await this.applyCoefficientTransformationToCriteriaInstance(
         await this.getMostAvgRatedUntriedHobbiesFromCategories(
           userId,
           await getCoefficientedValue(
@@ -39,7 +39,7 @@ export class HobbyRecommendationService {
         ),
         HobbyRecommendationCoefficientField.AVG_RATING_FROM_HOBBY_CATEGORIES_OF_HOBBIES
       ),
-      this.applyCoefficientTransformationToCriteriaInstance(
+      await this.applyCoefficientTransformationToCriteriaInstance(
         await this.getMostPopularUntriedHobbies(
           userId,
           await getCoefficientedValue(
@@ -49,7 +49,7 @@ export class HobbyRecommendationService {
         ),
         HobbyRecommendationCoefficientField.HOBBY_COUNT_FROM_GLOBAL_POPULARITY_OF_HOBBIES
       ),
-      this.applyCoefficientTransformationToCriteriaInstance(
+      await this.applyCoefficientTransformationToCriteriaInstance(
         await this.getMostPopularUntriedHobbiesAmongFriends(
           userId,
           await getCoefficientedValue(
@@ -79,24 +79,34 @@ export class HobbyRecommendationService {
 
     const highestValueHobbyId = mergedCriteria.reduce((acc, cur) => {
       return cur.value > acc.value ? cur : acc;
-    }).id;
+    }).hobbyId;
 
     return await AppDataSource.getRepository(Hobby).findOneBy({
       id: highestValueHobbyId,
     });
   }
 
-  private applyCoefficientTransformationToCriteriaInstance(
+  private async applyCoefficientTransformationToCriteriaInstance(
     instance: HobbyRecommendationCriteriaInstance,
     coefficientField: HobbyRecommendationCoefficientField
   ) {
     const getCoefficientedValue =
       this.hobbyRecommendationCoefficientService.getCoefficientedValue;
 
-    return instance.map((hobbyAndValue) => ({
-      ...hobbyAndValue,
-      value: getCoefficientedValue(coefficientField, hobbyAndValue.value),
-    }));
+    const result = await Promise.all(
+      instance.map(async (hobbyAndValue) => {
+        const value = await getCoefficientedValue(
+          coefficientField,
+          hobbyAndValue.value
+        );
+        return {
+          ...hobbyAndValue,
+          value,
+        };
+      })
+    );
+
+    return result;
   }
 
   private async getMostRatedUntriedHobbiesFromSimiliarUsers(
@@ -108,7 +118,6 @@ export class HobbyRecommendationService {
     let batchNumber = 0;
 
     while (true) {
-      console.log("loop3");
       const mostSimilarUsers = await AppDataSource.getRepository(UserHobby)
         .createQueryBuilder("uh1")
         .select("uh2.userId", "userId")
@@ -116,7 +125,7 @@ export class HobbyRecommendationService {
         .innerJoin(
           UserHobby,
           "uh2",
-          "uh1.userId != uh2.userId AND uh1.hobbyId = uh2.hobbyId AND ((uh1.rating <= 5 AND uh2.rating <= 5) OR (uh1.rating > 5 AND uh2.rating > 5))"
+          "uh1.userId != uh2.userId AND uh1.hobbyId = uh2.hobbyId AND uh1.rating != NULL AND uh2.rating != NULL AND ((uh1.rating <= 5 AND uh2.rating <= 5) OR (uh1.rating > 5 AND uh2.rating > 5))"
         )
         .where("uh1.userId = :userId", { userId })
         .groupBy("uh2.userId")
@@ -147,6 +156,7 @@ export class HobbyRecommendationService {
                 )`,
             { userId }
           )
+          .andWhere("uh.rating != NULL")
           .groupBy("uh.hobbyId")
           .orderBy("ratingSum", "DESC")
           .getRawMany();
@@ -177,7 +187,7 @@ export class HobbyRecommendationService {
         .select("h.category", "category")
         .addSelect("AVG(uh.rating)", "averageRating")
         .innerJoin(Hobby, "h", "uh.hobbyId = h.id")
-        .where("uh.userId = :userId", { userId })
+        .where("uh.userId = :userId AND uh.rating != NULL", { userId })
         .groupBy("h.category")
         .orderBy("averageRating", "DESC")
         .offset(batchNumber * batchSize)
@@ -199,7 +209,7 @@ export class HobbyRecommendationService {
           .createQueryBuilder("h")
           .select("h.id", "hobbyId")
           .addSelect(
-            `(SELECT AVG(uh.rating) FROM user_hobby uh WHERE uh.hobbyId = h.id)`,
+            `(SELECT AVG(uh.rating) FROM user_hobby uh WHERE uh.hobbyId = h.id AND uh.rating != NULL)`,
             "value"
           )
           .where("h.category = :category", { category })

@@ -17,7 +17,7 @@ export class UserHobby {
   @Column({ type: "enum", enum: UserHobbyStatus })
   status: UserHobbyStatus;
 
-  @Column()
+  @Column({ nullable: true })
   rating: number;
 
   @ManyToOne(() => Hobby, (hobby) => hobby.userHobbies)

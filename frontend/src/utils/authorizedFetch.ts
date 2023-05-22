@@ -2,7 +2,8 @@ import { getAuthData } from "./getAuthData";
 
 async function authorizedFetch(
   url: RequestInfo | URL,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  customStatusHandler?: (status: number, jsonResponse: any) => any
 ) {
   const authorizationHeader = getAuthData()?.authorizationHeader;
 
@@ -16,6 +17,11 @@ async function authorizedFetch(
     },
     ...options,
   });
+
+  if (customStatusHandler) {
+    const jsonResponse = await response.json();
+    return customStatusHandler(response.status, jsonResponse);
+  }
 
   if (!response.ok) {
     throw new Error(`Request failed with status ${response.status}`);
