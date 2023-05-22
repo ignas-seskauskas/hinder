@@ -90,7 +90,7 @@ export class HobbyController {
     response: Response,
     next: NextFunction
   ) {
-    const id = parseInt(request.params.id);
+    const id = parseInt(request.body.id);
     const user = request.user;
     const hobby = await this.hobbyRepository.findOne({
       where: { id },
@@ -118,7 +118,7 @@ export class HobbyController {
       return;
     }
 
-    await AppDataSource.manager.save(
+    return await AppDataSource.manager.save(
       AppDataSource.manager.create(UserHobby, {
         status: UserHobbyStatus.ACTIVE,
         user: user,
@@ -128,7 +128,7 @@ export class HobbyController {
   }
 
   async dismissHobby(request: Request, response: Response, next: NextFunction) {
-    const id = parseInt(request.params.id);
+    const id = parseInt(request.body.id);
     const user = request.user;
     const hobby = await this.hobbyRepository.findOne({
       where: { id },
@@ -156,7 +156,7 @@ export class HobbyController {
       return;
     }
 
-    await AppDataSource.manager.save(
+    return await AppDataSource.manager.save(
       AppDataSource.manager.create(UserHobby, {
         status: UserHobbyStatus.REJECTED,
         user: user,
