@@ -85,6 +85,7 @@ async function seedDB() {
     userFriend.searcher = otherUserCreated;
     userFriend.friendshipStartDate = new Date("2023-05-16");
     userFriend.requestSent = true;
+    userFriend.requestAccepted = true;
     await AppDataSource.manager.save(userFriend);
 
     const userHobby1 = new UserHobby();

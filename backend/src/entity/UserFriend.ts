@@ -18,6 +18,9 @@ export class UserFriend {
   @Column()
   requestSent: boolean;
 
+  @Column()
+  requestAccepted: boolean;
+
   @ManyToOne(() => User, (user) => user.initiatedFriendships)
   searcher: User;
 

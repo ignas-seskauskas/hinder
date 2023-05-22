@@ -17,6 +17,7 @@ const NavBarView = () => {
     //{ title: "Hobby", path: "/not_implemented" },
     { title: "Hobby List", path: "/hobby/list" },
     { title: "Route List", path: "/route/list" },
+    { title: "Friends", path: "/friends" },
   ];
 
   return (
