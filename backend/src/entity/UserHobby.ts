@@ -23,6 +23,6 @@ export class UserHobby {
   @ManyToOne(() => Hobby, (hobby) => hobby.userHobbies)
   hobby: Hobby;
 
-  @ManyToOne(() => User, (user: User) => user.userHobbies)
+  @ManyToOne(() => User, (user) => user.userHobbies)
   user: User;
 }

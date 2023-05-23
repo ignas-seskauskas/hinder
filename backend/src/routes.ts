@@ -12,6 +12,12 @@ export const Routes = [
     action: "all",
   },
   {
+    method: "get",
+    route: "/friends/recommended",
+    controller: FriendsController,
+    action: "recommended",
+  },
+  {
     method: "delete",
     route: "/friends/:id",
     controller: FriendsController,
