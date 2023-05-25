@@ -113,6 +113,7 @@ export class EventController {
 
     
         const message = "Success"
+        console.log(message);
         return message;
       }
 

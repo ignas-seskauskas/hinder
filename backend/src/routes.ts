@@ -109,15 +109,9 @@ export const Routes = [
     action: "registerUser",
   },
   {
-    method: "get",
+    method: "post",
     route: "/createeventsforhobby",
     controller: EventController,
     action: "createEventsForHobby",
-  },
-  {
-    method: "get",
-    route: "/graph",
-    controller: MicrosoftGraphAPI,
-    action: "GetToken",
-  },
+  }
 ];

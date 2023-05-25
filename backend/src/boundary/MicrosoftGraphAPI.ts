@@ -42,7 +42,7 @@ export class MicrosoftGraphAPI {
                 options,
                 function (error, response, body) {
                     if (!error && response.statusCode == 200) {
-                        console.log(body);
+                        //console.log(body);
                         resolve(body);
                     } else {
                         console.log(error);
@@ -82,7 +82,7 @@ export class MicrosoftGraphAPI {
             options,
             function (error, response, body) {
                 if (!error && response.statusCode == 201) {
-                    console.log(body);
+                    //console.log(body);
                     resolve(body);
                 } else {
                     console.log(error+body+response);

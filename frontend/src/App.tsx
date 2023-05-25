@@ -28,7 +28,7 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
           </Route>
           <Route element={<WithNav />}>
-            <Route path="/home" element={<AdminHomeView />} />
+            <Route path="/home" element={<HobbySearcherView />} />
             <Route path="/hobby/*" element={<HobbyPage />} />
             <Route path="/hobby/list" element={<HobbyListView />} />
             <Route path="/route/*" element={<RoutePage />} />
