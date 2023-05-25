@@ -20,6 +20,7 @@
       "express": "^4.17.2",
       "mysql": "^2.14.1",
       "reflect-metadata": "^0.1.13",
+      "request": "^2.88.2",
       "typeorm": "0.3.15"
    },
    "scripts": {
