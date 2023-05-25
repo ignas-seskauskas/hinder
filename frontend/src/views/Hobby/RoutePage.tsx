@@ -45,7 +45,7 @@ const RoutePage = () => {
   });
   const markerRef = useRef<L.Marker | null>(null);
   const [travelMethod, setTravelMethod] = useState<TravellingMethod | null>(
-    null,
+    null
   );
   const [nodes, setNodes] = useState<Node[]>([]);
   useEffect(() => {
@@ -85,8 +85,10 @@ const RoutePage = () => {
   useEffect(() => {
     const markers: L.Marker[] = [];
     placesData.forEach((place) => {
-      const marker = L.marker([place.properties.lat, place.properties.lon])
-        .addTo(mapObjRef.current!);
+      const marker = L.marker([
+        place.properties.lat,
+        place.properties.lon,
+      ]).addTo(mapObjRef.current!);
       marker.bindPopup(place.properties.name);
       markers.push(marker);
     });
@@ -100,12 +102,12 @@ const RoutePage = () => {
       const waypoints = markers.map((marker: L.Marker) => {
         const { lat, lng } = marker.getLatLng();
         nodes.push({ coordX: lat, coordY: lng });
-        return { "location": [lng, lat] };
+        return { location: [lng, lat] };
       });
       setNodes(nodes);
       const body = {
-        "mode": mode,
-        "waypoints": waypoints,
+        mode: mode,
+        waypoints: waypoints,
       };
       const fetchData = async () => {
         try {
@@ -115,7 +117,7 @@ const RoutePage = () => {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(body),
-            },
+            }
           );
           const data = await response.json();
           console.log(data);
@@ -127,9 +129,7 @@ const RoutePage = () => {
           }));
 
           console.log(routes);
-          const geojsonLayer = L.geoJSON(routes).addTo(
-            mapObjRef.current!,
-          );
+          const geojsonLayer = L.geoJSON(routes).addTo(mapObjRef.current!);
           mapObjRef.current!.fitBounds(geojsonLayer.getBounds());
           setIsRoutesFinished(true);
         } catch (error) {
@@ -156,7 +156,7 @@ const RoutePage = () => {
       const fetchData = async () => {
         try {
           const response = await fetch(
-            `https://api.geoapify.com/v2/places?categories=tourism,natural,national_park&bias=proximity:${lng},${lat}&limit=${places_max}&apiKey=${API_KEY}`,
+            `https://api.geoapify.com/v2/places?categories=tourism,natural,national_park&bias=proximity:${lng},${lat}&limit=${places_max}&apiKey=${API_KEY}`
           );
           const data = await response.json();
           setPlacesData(data.features);
@@ -171,15 +171,14 @@ const RoutePage = () => {
     const createRoute = (e: SyntheticEvent) => {
       e.preventDefault();
       const target = e.target as HTMLFormElement;
-      const name = (target.elements.namedItem(
-        "name",
-      ) as HTMLInputElement).value;
-      const distance = (target.elements.namedItem(
-        "distance",
-      ) as HTMLInputElement).value;
-      const travellingMethod = (target.elements.namedItem(
-        "travellingMethod",
-      ) as HTMLInputElement).value;
+      const name = (target.elements.namedItem("name") as HTMLInputElement)
+        .value;
+      const distance = (
+        target.elements.namedItem("distance") as HTMLInputElement
+      ).value;
+      const travellingMethod = (
+        target.elements.namedItem("travellingMethod") as HTMLInputElement
+      ).value;
       const travMet = travellingMethod as TravellingMethod;
       setTravelMethod(travMet);
       const newRoute: Route = {
@@ -250,9 +249,7 @@ const RoutePage = () => {
           )}
         </Form>
         <div ref={mapRef} style={{ height: "400px", width: "600px" }} />
-        <button onClick={getPlaces}>
-          Get interesting places
-        </button>
+        <button onClick={getPlaces}>Get interesting places</button>
       </div>
     );
   } else if (state.action === "view") {
@@ -260,9 +257,8 @@ const RoutePage = () => {
     const rateRoute = (e: SyntheticEvent) => {
       e.preventDefault();
       const target = e.target as HTMLFormElement;
-      const rating = (target.elements.namedItem(
-        "rating",
-      ) as HTMLInputElement).value;
+      const rating = (target.elements.namedItem("rating") as HTMLInputElement)
+        .value;
       const newRoute = state.route;
       newRoute.rating = rating;
 
@@ -297,22 +293,22 @@ const RoutePage = () => {
             <Form.Control
               type="text"
               value={newRating}
-              onChange={(e) =>
-                setNewRating(
-                  e.target.value,
-                )}
-            >
-            </Form.Control>
+              onChange={(e) => setNewRating(e.target.value)}
+            ></Form.Control>
           </Form.Group>
           <Form.Group controlId="distance">
             <Form.Label>Distance</Form.Label>
-            <Form.Control type="text" value={state.route.distance}>
-            </Form.Control>
+            <Form.Control
+              type="text"
+              value={state.route.distance}
+            ></Form.Control>
           </Form.Group>
           <Form.Group controlId="travellingMethod">
             <Form.Label>Travel method</Form.Label>
-            <Form.Control type="text" value={state.route.travellingMethod}>
-            </Form.Control>
+            <Form.Control
+              type="text"
+              value={state.route.travellingMethod}
+            ></Form.Control>
           </Form.Group>
           <Button variant="primary" type="submit">
             Submit rating

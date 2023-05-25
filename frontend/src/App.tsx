@@ -15,7 +15,7 @@ import AdminHomeView from "./views/Home/AdminHomeView";
 import RouteListView from "./views/Hobby/RouteListView";
 import RoutePage from "./views/Hobby/RoutePage";
 import AuthProvider from "./components/AuthProvider";
-import HobbyRecommendations from "./views/Hobby/HobbyRecommendations";
+import HobbyRecommendationsPage from "./views/Hobby/HobbyRecommendationsPage";
 
 function App() {
   return (
@@ -35,7 +35,7 @@ function App() {
             <Route path="/route/list" element={<RouteListView />} />
             <Route
               path="/hobby-recommendations"
-              element={<HobbyRecommendations />}
+              element={<HobbyRecommendationsPage />}
             />
           </Route>
         </Routes>

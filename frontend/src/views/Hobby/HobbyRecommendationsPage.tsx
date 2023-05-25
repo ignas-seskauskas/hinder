@@ -10,9 +10,12 @@ const startHobbyRecommendation = async () => {
   const response = await authorizedFetch(
     `${BASE_API_URL}/starthobbyrecommendation`,
     { method: "POST" },
-    (status: number) => {
+    (status: number, obj) => {
       if (status === 404) {
         return null;
+      }
+      if (status == 200) {
+        return obj;
       }
       throw new Error(`Request failed with status ${status}`);
     }
@@ -38,7 +41,7 @@ const dismissHobby = async (hobbyId: number) => {
   });
 };
 
-const HobbyRecommendations = () => {
+const HobbyRecommendationsPage = () => {
   const [recommendedHobby, setRecommendedHobby] = useState<Hobby | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -105,4 +108,4 @@ const HobbyRecommendations = () => {
   );
 };
 
-export default HobbyRecommendations;
+export default HobbyRecommendationsPage;

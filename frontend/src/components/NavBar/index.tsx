@@ -17,8 +17,11 @@ const NavBarView = () => {
     //{ title: "Hobby", path: "/not_implemented" },
     { title: "Hobby List", path: "/hobby/list" },
     { title: "Route List", path: "/route/list" },
-    { title: "Hobby Recommendations", path: "/hobby-recommendations" },
   ];
+
+  const openHobbyRecommendations = () => {
+    navigate("/hobby-recommendations");
+  };
 
   return (
     <Navbar fixed="top" bg="dark" variant="dark">
@@ -32,6 +35,9 @@ const NavBarView = () => {
               {link.title}
             </Nav.Link>
           ))}
+          <Nav.Link onClick={openHobbyRecommendations}>
+            Hobby Recommendations
+          </Nav.Link>
         </Nav>
         <Nav>
           <Nav.Link className="text-danger" onClick={logout}>
