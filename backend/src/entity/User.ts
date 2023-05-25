@@ -6,6 +6,7 @@ import {
   OneToMany,
 } from "typeorm";
 import { UserHobby } from "./UserHobby";
+import { Event } from "./Event";
 import { UserFriend } from "./UserFriend";
 
 export enum UserType {
@@ -46,4 +47,7 @@ export class User {
 
   @OneToMany(() => UserFriend, (userFriend) => userFriend.friend)
   receivedFriendships: UserFriend[];
+
+  @OneToMany(() => Event, (event) => event.creator)
+  events: Event[];
 }

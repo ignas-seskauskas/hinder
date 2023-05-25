@@ -2,6 +2,8 @@ import { HobbyController } from "./controller/HobbyController";
 import { RouteController } from "./controller/RouteController";
 import { HobbyRecommendationCoefficientController } from "./controller/HobbyRecommendationCoefficientController";
 import { UserController } from "./controller/UserController";
+import { EventController } from "./controller/EventController";
+import { MicrosoftGraphAPI } from "./boundary/MicrosoftGraphAPI";
 
 export const Routes = [
   {
@@ -105,5 +107,17 @@ export const Routes = [
     route: "/register",
     controller: UserController,
     action: "registerUser",
+  },
+  {
+    method: "get",
+    route: "/createeventsforhobby",
+    controller: EventController,
+    action: "createEventsForHobby",
+  },
+  {
+    method: "get",
+    route: "/graph",
+    controller: MicrosoftGraphAPI,
+    action: "GetToken",
   },
 ];
