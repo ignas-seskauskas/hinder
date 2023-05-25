@@ -7,7 +7,7 @@ import {
   Modal,
   Table,
 } from "react-bootstrap";
-import { useHistory, useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Route } from "../../interfaces/Route";
 
 const RouteListView = () => {
@@ -75,12 +75,8 @@ const RouteListView = () => {
                   </ListGroup.Item>
                 </td>
                 <td>
-                  <Button variant="primary">
-                    Edit
-                  </Button>{" "}
-                  <Button variant="danger">
-                    Delete
-                  </Button>
+                  <Button variant="primary">Edit</Button>{" "}
+                  <Button variant="danger">Delete</Button>
                 </td>
               </tr>
             ))}

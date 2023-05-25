@@ -8,8 +8,7 @@ const HobbySearcherView = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = () => {
     console.log(
       "Form submitted with username:",
       username,

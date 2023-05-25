@@ -1,12 +1,12 @@
-export interface Nore {
-    coordX: number;
-    coordY: number;
+export interface Node {
+  coordX: number;
+  coordY: number;
 }
 
 export enum TravellingMethod {
-    Walk = 'walk',
-    Bicycle = 'bicycle',
-    Drive = 'drive',
+  Walk = "walk",
+  Bicycle = "bicycle",
+  Drive = "drive",
 }
 
 export interface Route {
