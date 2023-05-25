@@ -10,6 +10,9 @@ dependencies:
   bootstrap:
     specifier: ^5.2.3
     version: 5.2.3(@popperjs/core@2.11.7)
+  classnames:
+    specifier: ^2.3.2
+    version: 2.3.2
   crypto-js:
     specifier: ^4.1.1
     version: 4.1.1

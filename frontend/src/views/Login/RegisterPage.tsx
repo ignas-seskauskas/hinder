@@ -44,11 +44,12 @@ const RegisterForm = () => {
         if (authData) {
           const userType = authData.type;
 
-          if (userType === UserType.Admin) {
-            navigate("/home");
-          } else if (userType === UserType.HobbyFinder) {
-            navigate("/hobby/list");
-          }
+          // if (userType === UserType.Admin) {
+          //   navigate("/home");
+          // } else if (userType === UserType.HobbyFinder) {
+          //   navigate("/hobby/list");
+          // }
+          navigate("/login");
         }
       } else {
         setError((await response.json()).error);
