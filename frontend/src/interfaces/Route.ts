@@ -1,16 +1,17 @@
 export interface Node {
-    coordX: number;
-    coordY: number;
+  name: String;
+  coordX: number;
+  coordY: number;
 }
 
 export enum TravellingMethod {
-    Walk = 'walk',
-    Bicycle = 'bicycle',
-    Drive = 'drive',
+  Walk = 'walk',
+  Bicycle = 'bicycle',
+  Drive = 'drive',
 }
 
 export interface Route {
-  id: number;
+  id?: number;
   name: string;
   distance: string;
   travellingMethod: TravellingMethod;
