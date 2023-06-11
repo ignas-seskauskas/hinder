@@ -1,14 +1,13 @@
 import { SyntheticEvent, useEffect, useRef, useState } from "react";
-import { json, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { Node, Route, TravellingMethod } from "../../interfaces/Route";
 import L from "leaflet";
 import "leaflet-routing-machine";
-import "./route-without-names.css";
 import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 import { Button, Form } from "react-bootstrap";
 import LoadingSpinner from "../../components/LoadingSpinner";
-
+import { BASE_API_URL } from "../../constants/api";
 
 interface Place {
   properties: {
@@ -24,22 +23,17 @@ interface GeoJSONFeature {
   geometry: object;
 }
 
-interface MapDetails {
-  lat: number;
-  lng: number;
-  zoomLevel: number;
-}
+// TODO: authFetch
 
 const RoutePage = () => {
-  const URL = "http://localhost:3000/routes";
+  const URL = BASE_API_URL + "/routes";
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isRoutesFinished, setIsRoutesFinished] = useState(false);
-  const mapRef = useRef<HTMLDivElement | null>(null);
+  const mapHtmlRef = useRef<HTMLDivElement | null>(null);
   const [placesData, setPlacesData] = useState<Place[]>([]);
   const [routeData, setRouteData] = useState<Route | null>(null);
-  const [markersData, setMarkersData] = useState<L.Marker[]>([]);
-  const [mapDetailsData, setMapDetailsData] = useState<MapDetails | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const isInitialMount = useRef(true);
 
   const { state } = useLocation();
@@ -55,15 +49,11 @@ const RoutePage = () => {
     shadowSize: [41, 41],
   });
   const markerRef = useRef<L.Marker | null>(null);
-  const [travelMethod, setTravelMethod] = useState<TravellingMethod | null>(
-    null,
-  );
   const [nodes, setNodes] = useState<Node[]>([]);
 
   // draws map and makes it interactable
   useEffect(() => {
-    console.log("map")
-    const map = L.map(mapRef.current!).setView([51.505, -0.09], 13);
+    const map = L.map(mapHtmlRef.current!).setView([51.505, -0.09], 13);
     mapObjRef.current = map;
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -71,23 +61,15 @@ const RoutePage = () => {
         'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
     }).addTo(map);
 
-    //const geoJsonLayer = L.geoJSON(
-    //  searchResults.map((result) => result.geojson),
-    //);
-    //geoJsonLayer.addTo(map);
-
-
-
     map.getContainer().style.cursor = "crosshair";
 
     function onMapClick(e: L.LeafletMouseEvent) {
       if (markerRef.current === null) {
         const marker = L.marker(e.latlng, { icon: greenIcon }).addTo(map);
-        marker.bindPopup("Chosen start point");
+        marker.bindPopup("Chosen starting point");
         markerRef.current = marker;
       } else {
         markerRef.current.setLatLng(e.latlng);
-        console.log(markerRef.current.getLatLng());
       }
     }
 
@@ -98,114 +80,31 @@ const RoutePage = () => {
     };
   }, []);
 
-
+  // adds places markers to the map
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
     } else {
       const markers: L.Marker[] = [];
-      console.log("placesdata")
       placesData.forEach((place) => {
         const marker = L.marker([place.properties.lat, place.properties.lon])
           .addTo(mapObjRef.current!);
         marker.bindPopup(place.properties.name);
         markers.push(marker);
-        setMarkersData(markers);
-        console.log("set markers");
       });
     }
   }, [placesData]);
 
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-    } else {
-      console.log("markres")
-      if (markersData.length >= 2) {
-        const routeControl = L.Routing.control({
-          waypoints: [],
-          show: false,
-        }).addTo(mapObjRef.current!);
-        const mode = travelMethod || "walk";
-        const waypoints = markersData.map((marker: L.Marker) => {
-          const { lat, lng } = marker.getLatLng();
-          nodes.push({ coordX: lat, coordY: lng });
-          return { "location": [lng, lat] };
-        });
-        setNodes(nodes);
-        const body = {
-          "mode": mode,
-          "waypoints": waypoints,
-        };
-        const routesURL = `${URL}/mapmatching`;
-        const fetchRoutes = async () => {
-          try {
-            console.log("mapmatching api");
-            const response = await fetch(
-              routesURL,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(body),
-              },
-            );
-            const data = await response.json();
-            console.log(data);
-
-            const features = data.features.map((feature: GeoJSONFeature) => ({
-              type: "Feature",
-              properties: {},
-              geometry: feature.geometry,
-            }));
-
-            console.log(features);
-            const geojsonLayer = L.geoJSON(features).addTo(
-              mapObjRef.current!,
-            );
-            mapObjRef.current!.fitBounds(geojsonLayer.getBounds());
-            setIsRoutesFinished(true);
-          } catch (error) {
-            console.error("Error fetching route data:", error);
-          }
-        };
-
-        fetchRoutes();
-      }
-    }
-  }, [markersData]);
-
   let content;
 
   if (state.action === "create") {
-    function getPlaces() {
-      if (markerRef.current === null) {
-        alert("Put a marker on the map");
-        return;
-      }
-      const { lat, lng } = markerRef.current.getLatLng();
-      const placesURL = `${URL}/interesting-places/${lng}/${lat}`;
-      //const places_max = 5;
-      const fetchInterestingPlaces = async () => {
-        setIsLoading(true);
-        try {
-          const response = await fetch(
-            placesURL,
-            //`https://api.geoapify.com/v2/places?categories=tourism,natural,national_park&bias=proximity:${lng},${lat}&limit=${places_max}&apiKey=${API_KEY}`,
-          );
-          const data = await response.json();
-          setPlacesData(data.features);
-          console.log(data);
-        } catch (error) {
-          console.error("Error fetching interesting places data:", error);
-        }
-        setIsLoading(false);
-
-      };
-      fetchInterestingPlaces();
-    }
-
     const createRoute = (e: SyntheticEvent) => {
       e.preventDefault();
+      if (markerRef.current === null) {
+        alert("Click on the map for starting point");
+        return;
+      }
+
       const target = e.target as HTMLFormElement;
       const name = (target.elements.namedItem(
         "name",
@@ -217,36 +116,98 @@ const RoutePage = () => {
         "travellingMethod",
       ) as HTMLInputElement).value;
       const travMet = travellingMethod as TravellingMethod;
-      setTravelMethod(travMet);
       const newRoute: Route = {
-        id: Date.now(),
         name: name,
         distance: distance,
         travellingMethod: travMet,
         rating: 0,
-        nodes: nodes,
+        nodes: [],
       };
+      setRouteData(newRoute);
+
+      const body = { newRoute: newRoute, startPosition: markerRef.current!.getLatLng() };
       setNodes([]);
 
-      console.log(newRoute);
+      const create = async () => {
+        setIsLoading(true);
 
-      fetch(URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newRoute),
-      })
-        .then((response) => {
-          console.log(response);
-          if (response.ok) {
-            console.log("DB updated");
-          }
-          return response.json();
+        await fetch(URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
         })
-        .then((data) => {
-          setErrorMessage(data.error);
-        });
+          .then((response) => {
+            if (response.ok) {
+              console.log("DB updated");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            if (data.error !== undefined) {
+              setErrorMessage(data.error);
+            } else {
+              const features = data.roads.features.map((feature: GeoJSONFeature) => ({
+                type: "Feature",
+                properties: {},
+                geometry: feature.geometry,
+              }));
+              setNodes(data.nodes);
+
+              const places: Place[] = data.nodes?.map((node: Node) => ({
+                properties: { name: "", lat: node.coordX, lon: node.coordY }
+              }));
+              setPlacesData(places);
+
+              const geojsonLayer = L.geoJSON(features).addTo(
+                mapObjRef.current!,
+              );
+              mapObjRef.current!.fitBounds(geojsonLayer.getBounds());
+              setIsRoutesFinished(true);
+              setErrorMessage("");
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+
+        setIsLoading(false);
+      }
+      create();
+    };
+
+    const submitRoute = (e: SyntheticEvent) => {
+      e.preventDefault();
+      if (routeData != null) {
+        const newRoute: Route = {
+          name: routeData.name,
+          distance: routeData?.distance,
+          travellingMethod: routeData?.travellingMethod,
+          rating: 0,
+          nodes: nodes,
+        };
+        setNodes([]);
+
+        fetch(`${URL}/new`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newRoute),
+        })
+          .then((response) => {
+            if (response.ok) {
+              console.log("DB updated");
+              setIsSubmitted(true);
+              alert("Map creation was successful!");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            setErrorMessage(data.error);
+          });
+      }
     };
 
     content = (
@@ -282,18 +243,18 @@ const RoutePage = () => {
             </select>
           </div>
           <br />
-          {!isRoutesFinished &&
-            <Button onClick={getPlaces}>
-              Get interesting places
+          {!isRoutesFinished && !isLoading &&
+            <Button type="submit">
+              Create Route
             </Button>
           }
-          {isRoutesFinished && (
-            <Button variant="primary" type="submit">
-              Add New Route
+          {isRoutesFinished && !isSubmitted  && (
+            <Button variant="primary" onClick={submitRoute}>
+              Submit Route
             </Button>
           )}
         </Form>
-        <div ref={mapRef} style={{ height: "400px", width: "600px" }} />
+        <div ref={mapHtmlRef} style={{ height: "400px", width: "600px" }} />
       </div>
     );
   } else if (state.action === "view") {
@@ -309,34 +270,34 @@ const RoutePage = () => {
         }).then((res) => {
           return res.json();
         }).then((data) => {
-          console.log(data);
+          const route: Route = data.route;
 
-          const route: Route = data;
-          console.log(route);
-          //setRouteData(data);
-          const places: Place[] = route.nodes?.map((node: Node) => ({ properties: { name: "", lat: node.coordX, lon: node.coordY } }
-          ));
-          console.log("yeet", places);
+          const places: Place[] = route.nodes?.map((node: Node) => ({
+            properties: { name: "", lat: node.coordX, lon: node.coordY }
+          }));
+
           setPlacesData(places);
+          const features = data.roads.features.map((feature: GeoJSONFeature) => ({
+            type: "Feature",
+            properties: {},
+            geometry: feature.geometry,
+          }));
+          
+          setNodes(data.nodes);
 
+          const geojsonLayer = L.geoJSON(features).addTo(
+            mapObjRef.current!,
+          );
+          mapObjRef.current!.fitBounds(geojsonLayer.getBounds());
         }).catch((err) => {
-          console.log("ERRR", err);
-          // setErrorMessage(err.err);
+          console.error(err);
         });
       }
       fetchData();
     }, []);
 
     const [newRating, setNewRating] = useState(state.route.rating);
-    interface Place {
-      properties: {
-        name: string;
-        lat: number;
-        lon: number;
-      };
-    }
-    //const route: Route = state.route;
-    // console.log(route.nodes)
+
     const rateRoute = (e: SyntheticEvent) => {
       e.preventDefault();
       const target = e.target as HTMLFormElement;
@@ -354,8 +315,8 @@ const RoutePage = () => {
         body: JSON.stringify(newRoute),
       })
         .then((response) => {
-          console.log(response);
           if (response.ok) {
+            alert("Map rating updated successfully");
             console.log("DB updated");
           }
           return response.json();
@@ -399,7 +360,7 @@ const RoutePage = () => {
             Submit rating
           </Button>
         </Form>
-        <div ref={mapRef} style={{ height: "400px", width: "600px" }} />
+        <div ref={mapHtmlRef} style={{ height: "400px", width: "600px" }} />
       </div>
     );
   }

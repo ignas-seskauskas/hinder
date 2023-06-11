@@ -44,9 +44,9 @@ const LoginForm = () => {
           const userType = authData.type;
 
           if (userType === UserType.Admin) {
-            navigate("/home");
+            navigate("/admin");
           } else if (userType === UserType.HobbyFinder) {
-            navigate("/hobby/list");
+            navigate("/home");
           }
         }
       } else {

@@ -6,16 +6,19 @@ import {
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { Route } from "../../interfaces/Route";
+import { BASE_API_URL } from "../../constants/api";
+
+// TODO: authFetch
 
 const RouteListView = () => {
-  const URL = "http://localhost:3000/routes";
+  const URL = BASE_API_URL + "/routes";
   const pathPrefix = "/route/";
   const [data, setData] = useState<Route[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/routes");
+        const response = await fetch(URL, {method: "GET"});
         if (!response.ok) {
           console.log(response);
           throw new Error("Failed to fetch data");

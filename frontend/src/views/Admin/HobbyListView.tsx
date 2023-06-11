@@ -1,6 +1,9 @@
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import { Button, Form, InputGroup, Modal, Table } from "react-bootstrap";
 import Hobby from "../../interfaces/Hobby";
+import { BASE_API_URL } from "../../constants/api";
+
+// TODO: authFetch
 
 enum Place {
   Indoors = "Indoors",
@@ -13,7 +16,7 @@ enum Type {
 }
 
 const HobbyListView = () => {
-  const URL = "http://localhost:3000/hobbies";
+  const URL = BASE_API_URL + "/hobbies";
   const [hobbyList, setHobbyList] = useState<Hobby[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [toDelete, setToDelete] = useState<boolean>(false);
@@ -47,7 +50,7 @@ const HobbyListView = () => {
     fetchData();
   }, []);
 
-  const handleModalHide = () => {
+  const cancelModal = () => {
     setShowModal(false);
     setSelectedHobby(null);
     setNewHobby(emptyHobby);
@@ -63,17 +66,16 @@ const HobbyListView = () => {
 
   const deleteHobby = () => {
     if (selectedHobby) {
-      const finalURL = URL + "/" + selectedHobby.id.toString();
+      const finalURL = `${URL}/${selectedHobby.id.toString()}`;
       fetch(finalURL, {
         method: "delete",
       }).then((response) => {
-        console.log(response);
         if (response.ok) {
           const updatedList = hobbyList.filter(
             (hobby) => hobby.id !== selectedHobby.id
           );
           setHobbyList(updatedList);
-          handleModalHide();
+          cancelModal();
         }
         return response;
       });
@@ -89,7 +91,7 @@ const HobbyListView = () => {
     e.preventDefault();
 
     if (selectedHobby) {
-      fetch(URL, {
+      fetch(URL + "/update", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -97,7 +99,6 @@ const HobbyListView = () => {
         body: JSON.stringify(selectedHobby),
       })
         .then((response) => {
-          console.log(response);
           if (response.ok) {
             const updatedList = hobbyList.map((hobby) => {
               if (hobby.id === selectedHobby.id) {
@@ -109,6 +110,7 @@ const HobbyListView = () => {
             setHobbyList(updatedList);
             setShowModal(false);
             setSelectedHobby(null);
+            setErrorMessage("");
           }
           return response.json();
         })
@@ -118,11 +120,14 @@ const HobbyListView = () => {
     }
   };
 
+  const chooseCreateHobby = () => {
+    setShowModal(true);
+  };
+
   const createHobby = (e: SyntheticEvent) => {
     e.preventDefault();
 
     const newHobbyID = { ...newHobby, id: Date.now() };
-    console.log(newHobbyID);
 
     fetch(URL, {
       method: "POST",
@@ -132,11 +137,11 @@ const HobbyListView = () => {
       body: JSON.stringify(newHobbyID),
     })
       .then((response) => {
-        console.log(response);
         if (response.ok) {
           setHobbyList([...hobbyList, newHobbyID]);
           setShowModal(false);
           setNewHobby(emptyHobby);
+          setErrorMessage("");
         }
         return response.json();
       })
@@ -148,7 +153,7 @@ const HobbyListView = () => {
   return (
     <div>
       <h3>Hobby list view</h3>
-      <Button variant="success" onClick={() => setShowModal(true)}>
+      <Button variant="success" onClick={() => chooseCreateHobby()}>
         Add hobby
       </Button>
       <Table striped bordered hover>
@@ -181,7 +186,7 @@ const HobbyListView = () => {
         </tbody>
       </Table>
 
-      <Modal show={showModal} onHide={handleModalHide}>
+      <Modal show={showModal} onHide={cancelModal}>
         {toDelete && selectedHobby ? (
           <>
             <Modal.Header closeButton>
@@ -193,7 +198,7 @@ const HobbyListView = () => {
             </Modal.Body>
 
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleModalHide}>
+              <Button variant="secondary" onClick={cancelModal}>
                 Cancel
               </Button>
               <Button variant="danger" onClick={deleteHobby}>
@@ -288,7 +293,7 @@ const HobbyListView = () => {
             </Modal.Body>
 
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleModalHide}>
+              <Button variant="secondary" onClick={cancelModal}>
                 Cancel
               </Button>
               <Button variant="primary" onClick={editHobby}>
@@ -353,7 +358,7 @@ const HobbyListView = () => {
             </Modal.Body>
 
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleModalHide}>
+              <Button variant="secondary" onClick={cancelModal}>
                 Cancel
               </Button>
               <Button variant="primary" onClick={createHobby}>

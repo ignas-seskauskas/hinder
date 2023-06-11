@@ -10,7 +10,7 @@ export const Routes = [
     method: "get",
     route: "/hobbies",
     controller: HobbyController,
-    action: "all",
+    action: "get",
   },
   {
     method: "get",
@@ -22,13 +22,19 @@ export const Routes = [
     method: "post",
     route: "/hobbies",
     controller: HobbyController,
-    action: "save",
+    action: "create",
+  },
+  {
+    method: "post",
+    route: "/hobbies/update",
+    controller: HobbyController,
+    action: "update",
   },
   {
     method: "delete",
     route: "/hobbies/:id",
     controller: HobbyController,
-    action: "remove",
+    action: "delete",
   },
   {
     method: "get",
@@ -52,7 +58,13 @@ export const Routes = [
     method: "post",
     route: "/routes",
     controller: RouteController,
-    action: "save",
+    action: "create",
+  },
+  {
+    method: "post",
+    route: "/routes/new",
+    controller: RouteController,
+    action: "submit",
   },
   {
     method: "get",
@@ -65,6 +77,12 @@ export const Routes = [
     route: "/routes/mapmatching",
     controller: RouteController,
     action: "getRoutes",
+  },
+  {
+    method: "post",
+    route: "/routes/generate-new",
+    controller: RouteController,
+    action: "generateRoute",
   },
   {
     method: "put",

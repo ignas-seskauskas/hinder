@@ -14,7 +14,7 @@ export class HobbyController {
   private userRepository = AppDataSource.getRepository(User);
   private hobbyRecommendationService = new HobbyRecommendationService();
 
-  async all(request: Request, response: Response, next: NextFunction) {
+  async get(request: Request, response: Response, next: NextFunction) {
     return this.hobbyRepository.find();
   }
 
@@ -31,21 +31,42 @@ export class HobbyController {
     return hobby;
   }
 
-  async save(request: Request, response: Response, next: NextFunction) {
-    //const { id, name, type, place, attempts, attemptDuration } = request.body;
+  async create(request: Request, response: Response, next: NextFunction) {
     const hobbyData: Hobby = request.body;
+
+    const errCount = this.validateData(hobbyData, response);
+
+    if (errCount > 0) {
+      return;
+    }
+
+    await this.hobbyRepository.save(hobbyData);
+
+    return "success";
+  }
+
+  async update(request: Request, response: Response, next: NextFunction) {
+    const hobbyData: Hobby = request.body;
+
+    const hobby = await this.hobbyRepository.findOne({
+      where: { id: hobbyData.id },
+    });
+    if (!hobby) {
+      return "hobby not found";
+    }
 
     const errCount = this.validateData(hobbyData, response);
     if (errCount > 0) {
       return;
     }
 
-    const hobby = Object.assign(new Hobby(), hobbyData);
+    const {id, ...hobbyUpdated} = hobbyData;
+    await this.hobbyRepository.update({ id: id}, hobbyUpdated);
 
-    return this.hobbyRepository.save(hobby);
+    return "success";
   }
 
-  async remove(request: Request, response: Response, next: NextFunction) {
+  async delete(request: Request, response: Response, next: NextFunction) {
     const id = parseInt(request.params.id);
 
     let hobbyToRemove = await this.hobbyRepository.findOneBy({ id });
@@ -54,11 +75,23 @@ export class HobbyController {
       return "this hobby does not exist";
     }
 
-    await this.deleteOfHobby(id);
+    //await this.deleteOfHobby(id);
+
+    await this.userHobbyRepository
+      .createQueryBuilder()
+      .delete()
+      .where("hobbyId = :hobbyId", { hobbyId: id })
+      .execute();
+
+    await this.routeRepository
+      .createQueryBuilder()
+      .delete()
+      .where("hobbyId = :hobbyId", { hobbyId: id })
+      .execute();
 
     await this.hobbyRepository.remove(hobbyToRemove);
 
-    return "hobby has been removed";
+    return "success";
   }
 
   async startHobbyRecommendation(
@@ -66,7 +99,7 @@ export class HobbyController {
     response: Response,
     next: NextFunction
   ) {
-    const userId = request.user?.id;
+    const userId = request.body.user?.id;
 
     const user =
       userId && (await this.userRepository.findOneBy({ id: userId }));

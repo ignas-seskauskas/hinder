@@ -11,7 +11,7 @@ import RegisterPage from "./views/Login/RegisterPage";
 import HobbySearcherView from "./views/Home/HobbySearcherView";
 import HobbyPage from "./views/Hobby/HobbyPage";
 import HobbyListView from "./views/Admin/HobbyListView";
-import AdminHomeView from "./views/Home/AdminHomeView";
+import AdminView from "./views/Home/AdminView";
 import RouteListView from "./views/Hobby/RouteListView";
 import RoutePage from "./views/Hobby/RoutePage";
 import AuthProvider from "./components/AuthProvider";
@@ -29,6 +29,7 @@ function App() {
           </Route>
           <Route element={<WithNav />}>
             <Route path="/home" element={<HobbySearcherView />} />
+            <Route path="/admin" element={<AdminView />} />
             <Route path="/hobby/*" element={<HobbyPage />} />
             <Route path="/hobby/list" element={<HobbyListView />} />
             <Route path="/route/*" element={<RoutePage />} />
